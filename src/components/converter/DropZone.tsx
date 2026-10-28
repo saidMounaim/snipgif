@@ -1,13 +1,15 @@
 import { useRef, useState, type DragEvent, type RefObject } from 'react';
-import { VIDEO_INPUT_ACCEPT } from '../../lib/video-file';
 
 interface DropZoneProps {
+	title: string;
+	hint: string;
+	accept: string;
 	onFiles: (files: FileList) => void;
 	describedBy: string;
 	buttonRef: RefObject<HTMLButtonElement | null>;
 }
 
-export default function DropZone({ onFiles, describedBy, buttonRef }: DropZoneProps) {
+export default function DropZone({ title, hint, accept, onFiles, describedBy, buttonRef }: DropZoneProps) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [dragging, setDragging] = useState(false);
 
@@ -45,15 +47,13 @@ export default function DropZone({ onFiles, describedBy, buttonRef }: DropZonePr
 						: 'border-zinc-300 bg-white hover:border-violet-400'
 				}`}
 			>
-				<span className="text-lg font-semibold text-zinc-900">
-					Drop a video here or click to choose
-				</span>
-				<span className="text-sm text-zinc-600">MP4, MOV, WebM, or AVI</span>
+				<span className="text-lg font-semibold text-zinc-900">{title}</span>
+				<span className="text-sm text-zinc-600">{hint}</span>
 			</button>
 			<input
 				ref={inputRef}
 				type="file"
-				accept={VIDEO_INPUT_ACCEPT}
+				accept={accept}
 				tabIndex={-1}
 				aria-hidden="true"
 				className="sr-only"

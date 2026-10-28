@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Compressor from '../components/compressor/Compressor';
+---
+
+<Layout title="GIF Compressor - Snipgif">
+	<main class="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-8 px-4 py-16">
+		<div class="flex flex-col items-center gap-4 text-center">
+			<h1 class="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
+				Make your GIFs smaller, free, fast, and private
+			</h1>
+			<p class="rounded-full bg-violet-100 px-4 py-1 text-sm font-medium text-violet-800">
+				Your files never leave your device
+			</p>
+			<a
+				href="/"
+				class="rounded text-sm font-medium text-violet-700 underline underline-offset-4 hover:text-violet-900 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-violet-600"
+			>
+				Convert a video to GIF
+			</a>
+		</div>
+		<Compressor client:load />
+	</main>
+</Layout>

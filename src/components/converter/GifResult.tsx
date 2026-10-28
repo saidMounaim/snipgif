@@ -1,13 +1,16 @@
-import { useMemo } from 'react';
-import { formatFileSize, gifFileName } from '../../lib/video-file';
+import { useMemo, type ReactNode } from 'react';
+import { formatFileSize } from '../../lib/video-file';
 import type { GifResult as GifResultData } from '../../lib/gif-engine';
 
 export type ResultFeedback = { tone: 'status' | 'error'; text: string };
 
 type Props = {
 	result: GifResultData;
-	videoName: string;
+	fileName: string;
+	alt: string;
 	onFeedback: (feedback: ResultFeedback | null) => void;
+	// Extra detail under the heading, such as the size saved by compression.
+	children?: ReactNode;
 };
 
 const SHARE_ERROR = "We couldn't share this GIF. Use Download instead.";
@@ -16,8 +19,7 @@ const COPY_DONE = 'GIF copied to the clipboard.';
 
 const BUTTON_FOCUS = 'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-violet-600';
 
-export default function GifResult({ result, videoName, onFeedback }: Props) {
-	const fileName = gifFileName(videoName);
+export default function GifResult({ result, fileName, alt, onFeedback, children }: Props) {
 	const file = useMemo(
 		() => new File([result.blob], fileName, { type: 'image/gif' }),
 		[result.blob, fileName],
@@ -57,10 +59,11 @@ export default function GifResult({ result, videoName, onFeedback }: Props) {
 					Your GIF
 				</h2>
 				<p className="text-sm text-zinc-600">{formatFileSize(result.sizeBytes)}</p>
+				{children}
 			</div>
 			<img
 				src={result.objectUrl}
-				alt={`GIF made from ${videoName}`}
+				alt={alt}
 				className="h-auto max-w-full self-center rounded-xl border border-zinc-200"
 			/>
 			{/* Stays in view at the bottom of small screens while the result is on screen. */}

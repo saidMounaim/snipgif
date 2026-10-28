@@ -4,6 +4,7 @@ import type { ClipRange } from './clip-range';
 import { cropFilter, type Crop } from './crop';
 import { QUALITY_COLORS, type OutputSettings } from './output-settings';
 import { directionFilter, outputSec, speedFilter, type Playback } from './playback';
+import type { GifSettings } from './gif-file';
 import type { SourceVideo } from './video-file';
 
 // Still-frame previews stay small whatever output width is chosen.
@@ -270,4 +271,42 @@ export async function convertToGif(
 	const data = await readAndDelete(engine, output);
 	if (!data) throw new ConversionError('ffmpeg produced no GIF');
 	return new Blob([data as Uint8Array<ArrayBuffer>], { type: 'image/gif' });
+}
+
+// Independent of the converter's video input: fixed file names, deleted after every run.
+export async function compressGif(file: File, settings: GifSettings, sourceWidth: number): Promise<Blob> {
+	const engine = await getEngine();
+	const source = 'source.gif';
+	const output = 'compressed.gif';
+	const { colors, frameStep, width } = settings;
+	// select keeps the original timestamps, so each kept frame also covers the skipped ones.
+	const filter =
+		(frameStep > 1 ? `select='not(mod(n\\,${frameStep}))',` : '') +
+		(width < sourceWidth ? `scale=${width}:-1:flags=lanczos,` : '') +
+		`split[a][b];[a]palettegen=max_colors=${colors}[p];[b][p]paletteuse`;
+
+	const lines: string[] = [];
+	const collect = ({ message }: { message: string }) => lines.push(message);
+	engine.on('log', collect);
+	try {
+		const data = await fetchFile(file).catch((reason: unknown) => {
+			throw asMemoryError(reason) ?? reason;
+		});
+		await guard(engine, engine.writeFile(source, data));
+		const exitCode = await guard(engine, engine.exec(['-i', source, '-vf', filter, '-loop', '0', output]));
+		if (exitCode !== 0) {
+			throw lines.some((line) => UNSUPPORTED_CONTENTS.test(line))
+				? new UnsupportedVideoError('ffmpeg cannot decode this GIF')
+				: new ConversionError(`ffmpeg exited with code ${exitCode}`);
+		}
+	} catch (error) {
+		await engine.deleteFile(output).catch(() => {});
+		throw error;
+	} finally {
+		engine.off('log', collect);
+		await engine.deleteFile(source).catch(() => {});
+	}
+	const result = await readAndDelete(engine, output);
+	if (!result) throw new ConversionError('ffmpeg produced no GIF');
+	return new Blob([result as Uint8Array<ArrayBuffer>], { type: 'image/gif' });
 }

@@ -8,7 +8,9 @@ import TextPanel from './TextPanel';
 import TrimTimeline, { type FramePreview } from './TrimTimeline';
 import {
 	formatFileSize,
+	gifFileName,
 	validateVideoFiles,
+	VIDEO_INPUT_ACCEPT,
 	type SourceVideo,
 	type VideoFileError,
 	type VideoFileWarning,
@@ -397,7 +399,14 @@ export default function Converter() {
 					</div>
 				</div>
 			) : (
-				<DropZone onFiles={handleFiles} describedBy={ERROR_ID} buttonRef={dropZoneRef} />
+				<DropZone
+					title="Drop a video here or click to choose"
+					hint="MP4, MOV, WebM, or AVI"
+					accept={VIDEO_INPUT_ACCEPT}
+					onFiles={handleFiles}
+					describedBy={ERROR_ID}
+					buttonRef={dropZoneRef}
+				/>
 			)}
 
 			<p id={ERROR_ID} role="alert" className="text-sm font-medium text-red-700 empty:hidden">
@@ -428,7 +437,14 @@ export default function Converter() {
 				</div>
 			) : null}
 
-			{video && gif ? <GifResult result={gif} videoName={video.name} onFeedback={setFeedback} /> : null}
+			{video && gif ? (
+				<GifResult
+					result={gif}
+					fileName={gifFileName(video.name)}
+					alt={`GIF made from ${video.name}`}
+					onFeedback={setFeedback}
+				/>
+			) : null}
 		</div>
 	);
 }
