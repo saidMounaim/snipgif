@@ -180,7 +180,6 @@ export async function extractFrame(atSec: number): Promise<Blob> {
 		'-i', name,
 		'-frames:v', '1',
 		'-vf', `scale='min(${FRAME_PREVIEW_WIDTH},iw)':-1`,
-		'-q:v', '4',
 		output,
 	]));
 	const data = await readAndDelete(engine, output);
