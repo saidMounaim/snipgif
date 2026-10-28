@@ -1,7 +1,18 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Converter from '../components/converter/Converter';
 ---
 
 <Layout title="Snipgif">
-	<h1 class="text-3xl font-bold">Snipgif</h1>
+	<main class="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-8 px-4 py-16">
+		<div class="flex flex-col items-center gap-4 text-center">
+			<h1 class="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
+				Turn any video into a GIF, free, fast, and private
+			</h1>
+			<p class="rounded-full bg-violet-100 px-4 py-1 text-sm font-medium text-violet-800">
+				Your files never leave your device
+			</p>
+		</div>
+		<Converter client:load />
+	</main>
 </Layout>
