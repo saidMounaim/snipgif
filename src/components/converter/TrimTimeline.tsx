@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
+import { useEffect, useRef, useState, type PointerEvent, type ReactNode, type SyntheticEvent } from 'react';
 import { CLIP_LIMITS, formatTime, lastFrameSec, moveEnd, moveStart, type ClipRange } from '../../lib/clip-range';
+import { cropAxis, cropPosition, moveCrop, type Crop, type FrameSize } from '../../lib/crop';
 
 export type FramePreview = { state: 'loading' } | { state: 'ready'; url: string } | { state: 'error' };
 
@@ -9,9 +10,13 @@ interface TrimTimelineProps {
 	durationSec: number | null;
 	range: ClipRange | null;
 	frames: { start: FramePreview; end: FramePreview };
+	frameSize: FrameSize | null;
+	crop: Crop | null;
 	disabled: boolean;
 	onRangeChange: (range: ClipRange) => void;
-	onPlayable: (durationSec: number) => void;
+	onCropChange: (crop: Crop) => void;
+	onPlayable: (durationSec: number, frameSize: FrameSize) => void;
+	onFrameSize: (frameSize: FrameSize) => void;
 	onUnplayable: () => void;
 }
 
@@ -22,12 +27,95 @@ const THUMB =
 // Two native range inputs share one track so keyboard and screen-reader support come for free.
 const SLIDER = `pointer-events-none absolute inset-0 h-11 w-full appearance-none bg-transparent focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-violet-600 disabled:opacity-60 ${THUMB}`;
 
-function Frame({ label, preview, atSec }: { label: string; preview: FramePreview; atSec: number }) {
+// Dims everything outside the kept area; the box can be dragged along the crop's free axis.
+function CropOverlay({ crop, disabled, onChange }: { crop: Crop; disabled: boolean; onChange: (crop: Crop) => void }) {
+	const drag = useRef<{ start: number; position: number } | null>(null);
+	const axis = cropAxis(crop);
+	const movable = axis !== null && !disabled;
+
+	function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
+		if (!movable) return;
+		event.currentTarget.setPointerCapture(event.pointerId);
+		drag.current = { start: axis === 'x' ? event.clientX : event.clientY, position: cropPosition(crop) };
+	}
+
+	function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
+		const frame = event.currentTarget.parentElement?.getBoundingClientRect();
+		if (!drag.current || !frame || !axis) return;
+		// Pixels the box can travel along its free axis at the current rendered size.
+		const travel = axis === 'x' ? frame.width * (1 - crop.w) : frame.height * (1 - crop.h);
+		const moved = (axis === 'x' ? event.clientX : event.clientY) - drag.current.start;
+		onChange(moveCrop(crop, drag.current.position + moved / travel));
+	}
+
+	function endDrag() {
+		drag.current = null;
+	}
+
+	return (
+		<div className="pointer-events-none absolute inset-0 overflow-hidden">
+			<div
+				aria-hidden="true"
+				onPointerDown={handlePointerDown}
+				onPointerMove={handlePointerMove}
+				onPointerUp={endDrag}
+				onPointerCancel={endDrag}
+				className={`absolute border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.55)] ${
+					movable ? `pointer-events-auto touch-none ${axis === 'x' ? 'cursor-ew-resize' : 'cursor-ns-resize'}` : ''
+				}`}
+				style={{
+					left: `${crop.x * 100}%`,
+					top: `${crop.y * 100}%`,
+					width: `${crop.w * 100}%`,
+					height: `${crop.h * 100}%`,
+				}}
+			/>
+		</div>
+	);
+}
+
+function Frame({
+	label,
+	preview,
+	atSec,
+	frameSize,
+	onFrameSize,
+	overlay,
+}: {
+	label: string;
+	preview: FramePreview;
+	atSec: number;
+	frameSize?: FrameSize | null;
+	onFrameSize?: (frameSize: FrameSize) => void;
+	overlay?: ReactNode;
+}) {
 	return (
 		<figure className="flex flex-1 flex-col gap-1">
 			<div className="flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-zinc-100 text-sm text-zinc-600">
 				{preview.state === 'ready' ? (
-					<img src={preview.url} alt={`Frame at ${formatTime(atSec)}`} className="h-full w-full object-contain" />
+					// Sized to the picture's own shape inside the 16:9 box, so an overlay lines up with it.
+					<div
+						className={frameSize ? 'relative' : 'relative h-full w-full'}
+						style={
+							frameSize
+								? {
+										aspectRatio: `${frameSize.width} / ${frameSize.height}`,
+										width: `min(100%, ${(56.25 * frameSize.width) / frameSize.height}%)`,
+									}
+								: undefined
+						}
+					>
+						<img
+							src={preview.url}
+							alt={`Frame at ${formatTime(atSec)}`}
+							onLoad={(event) => {
+								const { naturalWidth, naturalHeight } = event.currentTarget;
+								if (naturalWidth > 0 && naturalHeight > 0) onFrameSize?.({ width: naturalWidth, height: naturalHeight });
+							}}
+							className="absolute inset-0 h-full w-full object-contain"
+						/>
+						{frameSize ? overlay : null}
+					</div>
 				) : preview.state === 'loading' ? (
 					'Loading preview...'
 				) : (
@@ -45,9 +133,13 @@ export default function TrimTimeline({
 	durationSec,
 	range,
 	frames,
+	frameSize,
+	crop,
 	disabled,
 	onRangeChange,
+	onCropChange,
 	onPlayable,
+	onFrameSize,
 	onUnplayable,
 }: TrimTimelineProps) {
 	const videoRef = useRef<HTMLVideoElement>(null);
@@ -61,7 +153,7 @@ export default function TrimTimeline({
 
 	function handleMetadata(event: SyntheticEvent<HTMLVideoElement>) {
 		const player = event.currentTarget;
-		const { duration, videoWidth } = player;
+		const { duration, videoWidth, videoHeight } = player;
 		if (videoWidth > 0 && duration === Infinity) {
 			// Recordings without a stored duration (e.g. Chrome screen captures) report Infinity
 			// until the browser has seen the end.
@@ -69,8 +161,9 @@ export default function TrimTimeline({
 			player.currentTime = 1e9;
 			return;
 		}
-		if (videoWidth > 0 && Number.isFinite(duration) && duration > 0) onPlayable(duration);
-		else onUnplayable();
+		if (videoWidth > 0 && videoHeight > 0 && Number.isFinite(duration) && duration > 0) {
+			onPlayable(duration, { width: videoWidth, height: videoHeight });
+		} else onUnplayable();
 	}
 
 	function handleDurationChange(event: SyntheticEvent<HTMLVideoElement>) {
@@ -78,7 +171,7 @@ export default function TrimTimeline({
 		if (!measuringRef.current || !Number.isFinite(player.duration) || player.duration <= 0) return;
 		measuringRef.current = false;
 		player.currentTime = 0;
-		onPlayable(player.duration);
+		onPlayable(player.duration, { width: player.videoWidth, height: player.videoHeight });
 	}
 
 	function handleSeeked() {
@@ -117,29 +210,53 @@ export default function TrimTimeline({
 	const showVideo = mode === 'checking' || mode === 'playable';
 	const ready = range !== null && durationSec !== null;
 	const percent = (sec: number) => (durationSec ? (sec / durationSec) * 100 : 0);
+	const overlay = crop ? <CropOverlay crop={crop} disabled={disabled} onChange={onCropChange} /> : null;
 
 	return (
 		<div className="flex flex-col gap-4">
 			{showVideo ? (
-				<video
-					ref={videoRef}
-					src={previewUrl}
-					preload="metadata"
-					playsInline
-					onLoadedMetadata={handleMetadata}
-					onDurationChange={handleDurationChange}
-					onSeeked={handleSeeked}
-					onError={onUnplayable}
-					onTimeUpdate={handleTimeUpdate}
-					onPlay={() => setPlaying(true)}
-					onPause={() => setPlaying(false)}
-					className={`max-h-72 w-full rounded-lg bg-black ${mode === 'checking' ? 'hidden' : ''}`}
-				/>
+				<div className={`flex justify-center overflow-hidden rounded-lg bg-black ${mode === 'checking' ? 'hidden' : ''}`}>
+					{/* Once the shape is known, the box matches the picture (max 18rem tall) so the overlay lines up. */}
+					<div
+						className={frameSize ? 'relative' : 'relative w-full'}
+						style={
+							frameSize
+								? {
+										aspectRatio: `${frameSize.width} / ${frameSize.height}`,
+										width: `min(100%, calc(18rem * ${frameSize.width} / ${frameSize.height}))`,
+									}
+								: undefined
+						}
+					>
+						<video
+							ref={videoRef}
+							src={previewUrl}
+							preload="metadata"
+							playsInline
+							onLoadedMetadata={handleMetadata}
+							onDurationChange={handleDurationChange}
+							onSeeked={handleSeeked}
+							onError={onUnplayable}
+							onTimeUpdate={handleTimeUpdate}
+							onPlay={() => setPlaying(true)}
+							onPause={() => setPlaying(false)}
+							className={frameSize ? 'absolute inset-0 h-full w-full' : 'max-h-72 w-full'}
+						/>
+						{frameSize ? overlay : null}
+					</div>
+				</div>
 			) : null}
 
 			{mode === 'frames' && range ? (
 				<div className="flex gap-3">
-					<Frame label="Start" preview={frames.start} atSec={range.startSec} />
+					<Frame
+						label="Start"
+						preview={frames.start}
+						atSec={range.startSec}
+						frameSize={frameSize}
+						onFrameSize={onFrameSize}
+						overlay={overlay}
+					/>
 					<Frame label="End" preview={frames.end} atSec={lastFrameSec(range)} />
 				</div>
 			) : null}

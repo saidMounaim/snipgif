@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import CropPanel from './CropPanel';
 import DropZone from './DropZone';
 import GifResult, { type ResultFeedback } from './GifResult';
 import OutputSettingsPanel from './OutputSettingsPanel';
@@ -11,6 +12,7 @@ import {
 	type VideoFileWarning,
 } from '../../lib/video-file';
 import { defaultRange, lastFrameSec, type ClipRange } from '../../lib/clip-range';
+import type { Crop, FrameSize } from '../../lib/crop';
 import { DEFAULT_PRESET, presetSettings, type OutputSettings } from '../../lib/output-settings';
 import {
 	convertToGif,
@@ -82,6 +84,8 @@ export default function Converter() {
 	const [range, setRange] = useState<ClipRange | null>(null);
 	const [settings, setSettings] = useState<OutputSettings>(() => presetSettings(DEFAULT_PRESET));
 	const [frames, setFrames] = useState<{ start: FramePreview; end: FramePreview }>(LOADING_FRAMES);
+	const [frameSize, setFrameSize] = useState<FrameSize | null>(null);
+	const [crop, setCrop] = useState<Crop | null>(null);
 	const dropZoneRef = useRef<HTMLButtonElement>(null);
 	const selectedRef = useRef<HTMLHeadingElement>(null);
 	const returnFocusRef = useRef<'dropzone' | 'selected' | null>(null);
@@ -187,6 +191,8 @@ export default function Converter() {
 		setRange(null);
 		setSettings(presetSettings(DEFAULT_PRESET));
 		setFrames(LOADING_FRAMES);
+		setFrameSize(null);
+		setCrop(null);
 		replaceGif(null);
 		setConversion('idle');
 		setConversionError(null);
@@ -215,7 +221,8 @@ export default function Converter() {
 		returnFocusRef.current = 'dropzone';
 	}
 
-	function handlePlayable(seconds: number) {
+	function handlePlayable(seconds: number, size: FrameSize) {
+		setFrameSize(size);
 		setMedia({ kind: 'playable', durationSec: seconds });
 		setRange(defaultRange(seconds));
 	}
@@ -246,7 +253,7 @@ export default function Converter() {
 			setConversion('loading-core');
 			await loadGifEngine();
 			setConversion('converting');
-			const blob = await convertToGif(video, range, settings, (fraction) =>
+			const blob = await convertToGif(video, range, settings, crop, (fraction) =>
 				setProgress((current) => Math.max(current, fraction)),
 			);
 			replaceGif({ blob, objectUrl: URL.createObjectURL(blob), sizeBytes: blob.size });
@@ -304,10 +311,23 @@ export default function Converter() {
 							durationSec={durationSec}
 							range={range}
 							frames={frames}
+							frameSize={frameSize}
+							crop={crop}
 							disabled={busy}
 							onRangeChange={setRange}
+							onCropChange={setCrop}
 							onPlayable={handlePlayable}
+							onFrameSize={setFrameSize}
 							onUnplayable={readWithFfmpeg}
+						/>
+					) : null}
+					{range ? (
+						<CropPanel
+							crop={crop}
+							frameSize={frameSize}
+							unavailable={!frameSize && media.kind === 'frames' && frames.start.state === 'error'}
+							disabled={busy}
+							onChange={setCrop}
 						/>
 					) : null}
 					{range ? <OutputSettingsPanel settings={settings} disabled={busy} onChange={setSettings} /> : null}

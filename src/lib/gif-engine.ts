@@ -1,6 +1,7 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 import type { ClipRange } from './clip-range';
+import { cropFilter, type Crop } from './crop';
 import { QUALITY_COLORS, type OutputSettings } from './output-settings';
 import type { SourceVideo } from './video-file';
 
@@ -208,13 +209,16 @@ export async function convertToGif(
 	video: SourceVideo,
 	range: ClipRange,
 	settings: OutputSettings,
+	crop: Crop | null,
 	onProgress?: (fraction: number) => void,
 ): Promise<Blob> {
 	await prepareInput(video);
 	const { engine, name } = await currentInput();
 	const output = 'output.gif';
 	const { fps, width, quality } = settings;
+	// Crop first so Max width applies to the kept area.
 	const filter =
+		(crop ? `${cropFilter(crop)},` : '') +
 		`fps=${fps},scale='min(${width},iw)':-1:flags=lanczos,` +
 		`split[a][b];[a]palettegen=max_colors=${QUALITY_COLORS[quality]}[p];[b][p]paletteuse`;
 
