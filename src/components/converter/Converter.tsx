@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import DropZone from './DropZone';
+import GifResult, { type ResultFeedback } from './GifResult';
 import OutputSettingsPanel from './OutputSettingsPanel';
 import TrimTimeline, { type FramePreview } from './TrimTimeline';
 import {
@@ -15,6 +16,7 @@ import {
 	convertToGif,
 	EngineLoadError,
 	extractFrame,
+	type GifResult as GifResultData,
 	loadGifEngine,
 	prepareInput,
 	probeDuration,
@@ -65,7 +67,8 @@ export default function Converter() {
 	const [warning, setWarning] = useState<VideoFileWarning | null>(null);
 	const [conversion, setConversion] = useState<ConversionState>('idle');
 	const [conversionError, setConversionError] = useState<ConversionError | null>(null);
-	const [gifUrl, setGifUrl] = useState<string | null>(null);
+	const [gif, setGif] = useState<GifResultData | null>(null);
+	const [feedback, setFeedback] = useState<ResultFeedback | null>(null);
 	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 	const [media, setMedia] = useState<MediaState>({ kind: 'checking' });
 	const [range, setRange] = useState<ClipRange | null>(null);
@@ -74,7 +77,7 @@ export default function Converter() {
 	const dropZoneRef = useRef<HTMLButtonElement>(null);
 	const selectedRef = useRef<HTMLHeadingElement>(null);
 	const returnFocusRef = useRef<'dropzone' | 'selected' | null>(null);
-	const gifUrlRef = useRef<string | null>(null);
+	const gifRef = useRef<GifResultData | null>(null);
 	const previewUrlRef = useRef<string | null>(null);
 	const frameUrlsRef = useRef<{ start: string | null; end: string | null }>({ start: null, end: null });
 	const framesShownRef = useRef<{ start: number | null; end: number | null }>({ start: null, end: null });
@@ -108,7 +111,7 @@ export default function Converter() {
 	useEffect(
 		() => () => {
 			clearSelectionResources();
-			replaceGifUrl(null);
+			replaceGif(null);
 		},
 		[],
 	);
@@ -144,10 +147,11 @@ export default function Converter() {
 		};
 	}, [media.kind, range, busy]);
 
-	function replaceGifUrl(url: string | null) {
-		if (gifUrlRef.current) URL.revokeObjectURL(gifUrlRef.current);
-		gifUrlRef.current = url;
-		setGifUrl(url);
+	function replaceGif(next: GifResultData | null) {
+		if (gifRef.current) URL.revokeObjectURL(gifRef.current.objectUrl);
+		gifRef.current = next;
+		setGif(next);
+		setFeedback(null);
 	}
 
 	function replaceFrameUrl(edge: 'start' | 'end', url: string | null) {
@@ -175,7 +179,7 @@ export default function Converter() {
 		setRange(null);
 		setSettings(presetSettings(DEFAULT_PRESET));
 		setFrames(LOADING_FRAMES);
-		replaceGifUrl(null);
+		replaceGif(null);
 		setConversion('idle');
 		setConversionError(null);
 	}
@@ -226,14 +230,14 @@ export default function Converter() {
 
 	async function convert() {
 		if (!video || !range) return;
-		replaceGifUrl(null);
+		replaceGif(null);
 		setConversionError(null);
 		try {
 			setConversion('loading-core');
 			await loadGifEngine();
 			setConversion('converting');
-			const gif = await convertToGif(video, range, settings);
-			replaceGifUrl(URL.createObjectURL(gif));
+			const blob = await convertToGif(video, range, settings);
+			replaceGif({ blob, objectUrl: URL.createObjectURL(blob), sizeBytes: blob.size });
 			setConversion('done');
 		} catch (caught) {
 			setConversion('error');
@@ -250,7 +254,9 @@ export default function Converter() {
 				: READ_ERROR_MESSAGE
 			: conversionError
 				? CONVERSION_ERROR_MESSAGES[conversionError]
-				: '';
+				: feedback?.tone === 'error'
+					? feedback.text
+					: '';
 	const statusText = reading ? 'Reading your video...' : STATUS_MESSAGES[conversion];
 
 	return (
@@ -322,15 +328,10 @@ export default function Converter() {
 			<div aria-live="polite" className="flex flex-col gap-1 text-sm font-medium empty:hidden">
 				{video && warning ? <p className="text-amber-800">{WARNING_MESSAGES[warning]}</p> : null}
 				{video && statusText ? <p className="text-zinc-700">{statusText}</p> : null}
+				{video && feedback?.tone === 'status' ? <p className="text-zinc-700">{feedback.text}</p> : null}
 			</div>
 
-			{video && gifUrl ? (
-				<img
-					src={gifUrl}
-					alt={`GIF made from ${video.name}`}
-					className="h-auto max-w-full self-center rounded-xl border border-zinc-200"
-				/>
-			) : null}
+			{video && gif ? <GifResult result={gif} videoName={video.name} onFeedback={setFeedback} /> : null}
 		</div>
 	);
 }

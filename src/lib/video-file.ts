@@ -77,3 +77,9 @@ export function formatFileSize(bytes: number): string {
 	}
 	return `${value.toFixed(value < 10 ? 1 : 0)} ${units[unit]}`;
 }
+
+export function gifFileName(videoName: string): string {
+	const dot = videoName.lastIndexOf('.');
+	const base = (dot === -1 ? videoName : videoName.slice(0, dot)).trim();
+	return `${base || 'snipgif'}.gif`;
+}

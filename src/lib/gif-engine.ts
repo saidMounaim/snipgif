@@ -10,6 +10,12 @@ const FRAME_PREVIEW_WIDTH = 480;
 // Single-threaded core: the multi-threaded one needs COOP/COEP headers, which break AdSense.
 const CORE_BASE_URL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm';
 
+export type GifResult = {
+	blob: Blob;
+	objectUrl: string;
+	sizeBytes: number;
+};
+
 export class EngineLoadError extends Error {}
 export class ConversionError extends Error {}
 
