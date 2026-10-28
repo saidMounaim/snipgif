@@ -51,6 +51,8 @@ export default function TrimTimeline({
 	onUnplayable,
 }: TrimTimelineProps) {
 	const videoRef = useRef<HTMLVideoElement>(null);
+	// True while seeking past the end to make the browser measure a duration the file doesn't store.
+	const measuringRef = useRef(false);
 	const [playing, setPlaying] = useState(false);
 
 	useEffect(() => {
@@ -58,9 +60,32 @@ export default function TrimTimeline({
 	}, [disabled]);
 
 	function handleMetadata(event: SyntheticEvent<HTMLVideoElement>) {
-		const { duration, videoWidth } = event.currentTarget;
+		const player = event.currentTarget;
+		const { duration, videoWidth } = player;
+		if (videoWidth > 0 && duration === Infinity) {
+			// Recordings without a stored duration (e.g. Chrome screen captures) report Infinity
+			// until the browser has seen the end.
+			measuringRef.current = true;
+			player.currentTime = 1e9;
+			return;
+		}
 		if (videoWidth > 0 && Number.isFinite(duration) && duration > 0) onPlayable(duration);
 		else onUnplayable();
+	}
+
+	function handleDurationChange(event: SyntheticEvent<HTMLVideoElement>) {
+		const player = event.currentTarget;
+		if (!measuringRef.current || !Number.isFinite(player.duration) || player.duration <= 0) return;
+		measuringRef.current = false;
+		player.currentTime = 0;
+		onPlayable(player.duration);
+	}
+
+	function handleSeeked() {
+		// The seek finished without the browser finding an end; let ffmpeg try instead.
+		if (!measuringRef.current) return;
+		measuringRef.current = false;
+		onUnplayable();
 	}
 
 	function seek(sec: number) {
@@ -102,6 +127,8 @@ export default function TrimTimeline({
 					preload="metadata"
 					playsInline
 					onLoadedMetadata={handleMetadata}
+					onDurationChange={handleDurationChange}
+					onSeeked={handleSeeked}
 					onError={onUnplayable}
 					onTimeUpdate={handleTimeUpdate}
 					onPlay={() => setPlaying(true)}

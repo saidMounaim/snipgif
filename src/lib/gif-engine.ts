@@ -131,6 +131,27 @@ async function readAndDelete(engine: FFmpeg, path: string): Promise<Uint8Array |
 	return data instanceof Uint8Array && data.length > 0 ? data : null;
 }
 
+const toSeconds = (match: RegExpMatchArray) => Number(match[1]) * 3600 + Number(match[2]) * 60 + Number(match[3]);
+
+// Runs an ffmpeg command only for what it logs; a failed run still returns what was logged.
+// A failed earlier call may have discarded the engine; currentInput re-prepares the input if so.
+async function logOf(args: (name: string) => string[]): Promise<string> {
+	const { engine, name } = await currentInput();
+	const lines: string[] = [];
+	const collect = ({ message }: { message: string }) => lines.push(message);
+	engine.on('log', collect);
+	try {
+		// The log level outlives a call: after ffprobe's "-v error", ffmpeg would print no
+		// "Duration:" or "time=" lines unless the level is raised again.
+		await guard(engine, engine.exec(['-v', 'info', ...args(name)]));
+	} catch (reason) {
+		if (reason instanceof MemoryError) throw reason;
+	} finally {
+		engine.off('log', collect);
+	}
+	return lines.join('\n');
+}
+
 export async function probeDuration(): Promise<number> {
 	const { engine, name } = await currentInput();
 	const report = 'duration.txt';
@@ -147,20 +168,16 @@ export async function probeDuration(): Promise<number> {
 
 	if (!(duration > 0)) {
 		// Fallback for cores without ffprobe: ffmpeg prints "Duration: 00:01:02.50" for any input.
-		// A failed ffprobe may have discarded the engine; this re-prepares the input if so.
-		const fallback = await currentInput();
-		const lines: string[] = [];
-		const collect = ({ message }: { message: string }) => lines.push(message);
-		fallback.engine.on('log', collect);
-		try {
-			await guard(fallback.engine, fallback.engine.exec(['-hide_banner', '-i', fallback.name]));
-		} catch (reason) {
-			if (reason instanceof MemoryError) throw reason;
-		} finally {
-			fallback.engine.off('log', collect);
-		}
-		const match = lines.join('\n').match(/Duration: (\d+):(\d+):(\d+(?:\.\d+)?)/);
-		duration = match ? Number(match[1]) * 3600 + Number(match[2]) * 60 + Number(match[3]) : Number.NaN;
+		const match = (await logOf((name) => ['-hide_banner', '-i', name])).match(/Duration: (\d+):(\d+):(\d+(?:\.\d+)?)/);
+		duration = match ? toSeconds(match) : Number.NaN;
+	}
+
+	if (!(duration > 0)) {
+		// Recordings without a stored duration print "Duration: N/A". Copying the video stream
+		// to nowhere, without decoding it, reports how far it got in its last "time=" line.
+		const log = await logOf((name) => ['-hide_banner', '-i', name, '-map', '0:v:0', '-c', 'copy', '-f', 'null', '-']);
+		const times = [...log.matchAll(/time=(\d+):(\d+):(\d+(?:\.\d+)?)/g)];
+		duration = times.length > 0 ? toSeconds(times[times.length - 1]) : Number.NaN;
 	}
 
 	if (!(duration > 0) || !Number.isFinite(duration)) {
