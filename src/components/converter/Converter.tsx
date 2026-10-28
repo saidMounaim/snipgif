@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import DropZone from './DropZone';
+import OutputSettingsPanel from './OutputSettingsPanel';
 import TrimTimeline, { type FramePreview } from './TrimTimeline';
 import {
 	formatFileSize,
@@ -9,6 +10,7 @@ import {
 	type VideoFileWarning,
 } from '../../lib/video-file';
 import { defaultRange, lastFrameSec, type ClipRange } from '../../lib/clip-range';
+import { DEFAULT_PRESET, presetSettings, type OutputSettings } from '../../lib/output-settings';
 import {
 	convertToGif,
 	EngineLoadError,
@@ -67,6 +69,7 @@ export default function Converter() {
 	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 	const [media, setMedia] = useState<MediaState>({ kind: 'checking' });
 	const [range, setRange] = useState<ClipRange | null>(null);
+	const [settings, setSettings] = useState<OutputSettings>(() => presetSettings(DEFAULT_PRESET));
 	const [frames, setFrames] = useState<{ start: FramePreview; end: FramePreview }>(LOADING_FRAMES);
 	const dropZoneRef = useRef<HTMLButtonElement>(null);
 	const selectedRef = useRef<HTMLHeadingElement>(null);
@@ -170,6 +173,7 @@ export default function Converter() {
 		setPreviewUrl(url);
 		setMedia({ kind: 'checking' });
 		setRange(null);
+		setSettings(presetSettings(DEFAULT_PRESET));
 		setFrames(LOADING_FRAMES);
 		replaceGifUrl(null);
 		setConversion('idle');
@@ -228,7 +232,7 @@ export default function Converter() {
 			setConversion('loading-core');
 			await loadGifEngine();
 			setConversion('converting');
-			const gif = await convertToGif(video, range);
+			const gif = await convertToGif(video, range, settings);
 			replaceGifUrl(URL.createObjectURL(gif));
 			setConversion('done');
 		} catch (caught) {
@@ -278,6 +282,7 @@ export default function Converter() {
 							onUnplayable={readWithFfmpeg}
 						/>
 					) : null}
+					{range ? <OutputSettingsPanel settings={settings} disabled={busy} onChange={setSettings} /> : null}
 					<div className="flex flex-wrap gap-3">
 						{media.kind === 'unreadable' && media.reason === 'load' ? (
 							<button

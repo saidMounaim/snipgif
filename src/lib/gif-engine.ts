@@ -1,9 +1,11 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 import type { ClipRange } from './clip-range';
+import { QUALITY_COLORS, type OutputSettings } from './output-settings';
 import type { SourceVideo } from './video-file';
 
-export const GIF_SETTINGS = { fps: 10, maxWidth: 480 } as const;
+// Still-frame previews stay small whatever output width is chosen.
+const FRAME_PREVIEW_WIDTH = 480;
 
 // Single-threaded core: the multi-threaded one needs COOP/COEP headers, which break AdSense.
 const CORE_BASE_URL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm';
@@ -114,12 +116,11 @@ export async function extractFrame(atSec: number): Promise<Blob> {
 	const { engine, name } = await currentInput();
 	// Unique per call: overlapping requests interleave their exec/read/delete messages.
 	const output = `frame-${++frameCount}.jpg`;
-	const { maxWidth } = GIF_SETTINGS;
 	await engine.exec([
 		'-ss', atSec.toFixed(1),
 		'-i', name,
 		'-frames:v', '1',
-		'-vf', `scale='min(${maxWidth},iw)':-1`,
+		'-vf', `scale='min(${FRAME_PREVIEW_WIDTH},iw)':-1`,
 		'-q:v', '4',
 		output,
 	]);
@@ -128,14 +129,14 @@ export async function extractFrame(atSec: number): Promise<Blob> {
 	return new Blob([data as Uint8Array<ArrayBuffer>], { type: 'image/jpeg' });
 }
 
-export async function convertToGif(video: SourceVideo, range: ClipRange): Promise<Blob> {
+export async function convertToGif(video: SourceVideo, range: ClipRange, settings: OutputSettings): Promise<Blob> {
 	await prepareInput(video);
 	const { engine, name } = await currentInput();
 	const output = 'output.gif';
-	const { fps, maxWidth } = GIF_SETTINGS;
+	const { fps, width, quality } = settings;
 	const filter =
-		`fps=${fps},scale='min(${maxWidth},iw)':-1:flags=lanczos,` +
-		'split[a][b];[a]palettegen[p];[b][p]paletteuse';
+		`fps=${fps},scale='min(${width},iw)':-1:flags=lanczos,` +
+		`split[a][b];[a]palettegen=max_colors=${QUALITY_COLORS[quality]}[p];[b][p]paletteuse`;
 
 	try {
 		const exitCode = await engine.exec([
