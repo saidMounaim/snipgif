@@ -3,6 +3,7 @@ import CropPanel from './CropPanel';
 import DropZone from './DropZone';
 import GifResult, { type ResultFeedback } from './GifResult';
 import OutputSettingsPanel from './OutputSettingsPanel';
+import PlaybackPanel, { PLAYBACK_LIMIT_ID } from './PlaybackPanel';
 import TrimTimeline, { type FramePreview } from './TrimTimeline';
 import {
 	formatFileSize,
@@ -14,6 +15,7 @@ import {
 import { defaultRange, lastFrameSec, type ClipRange } from '../../lib/clip-range';
 import type { Crop, FrameSize } from '../../lib/crop';
 import { DEFAULT_PRESET, presetSettings, type OutputSettings } from '../../lib/output-settings';
+import { DEFAULT_PLAYBACK, tooLong, type Playback } from '../../lib/playback';
 import {
 	convertToGif,
 	EngineLoadError,
@@ -86,6 +88,7 @@ export default function Converter() {
 	const [frames, setFrames] = useState<{ start: FramePreview; end: FramePreview }>(LOADING_FRAMES);
 	const [frameSize, setFrameSize] = useState<FrameSize | null>(null);
 	const [crop, setCrop] = useState<Crop | null>(null);
+	const [playback, setPlayback] = useState<Playback>(DEFAULT_PLAYBACK);
 	const dropZoneRef = useRef<HTMLButtonElement>(null);
 	const selectedRef = useRef<HTMLHeadingElement>(null);
 	const returnFocusRef = useRef<'dropzone' | 'selected' | null>(null);
@@ -98,6 +101,7 @@ export default function Converter() {
 
 	const busy = conversion === 'loading-core' || conversion === 'converting';
 	const durationSec = media.kind === 'playable' || media.kind === 'frames' ? media.durationSec : null;
+	const gifTooLong = range !== null && tooLong(range, playback);
 
 	// Without this, a file dropped outside the zone makes the browser navigate to it.
 	useEffect(() => {
@@ -193,6 +197,7 @@ export default function Converter() {
 		setFrames(LOADING_FRAMES);
 		setFrameSize(null);
 		setCrop(null);
+		setPlayback(DEFAULT_PLAYBACK);
 		replaceGif(null);
 		setConversion('idle');
 		setConversionError(null);
@@ -245,7 +250,7 @@ export default function Converter() {
 	}
 
 	async function convert() {
-		if (!video || !range) return;
+		if (!video || !range || gifTooLong) return;
 		replaceGif(null);
 		setConversionError(null);
 		setProgress(0);
@@ -253,7 +258,7 @@ export default function Converter() {
 			setConversion('loading-core');
 			await loadGifEngine();
 			setConversion('converting');
-			const blob = await convertToGif(video, range, settings, crop, (fraction) =>
+			const blob = await convertToGif(video, range, settings, crop, playback, (fraction) =>
 				setProgress((current) => Math.max(current, fraction)),
 			);
 			replaceGif({ blob, objectUrl: URL.createObjectURL(blob), sizeBytes: blob.size });
@@ -330,6 +335,9 @@ export default function Converter() {
 							onChange={setCrop}
 						/>
 					) : null}
+					{range ? (
+						<PlaybackPanel playback={playback} range={range} disabled={busy} onChange={setPlayback} />
+					) : null}
 					{range ? <OutputSettingsPanel settings={settings} disabled={busy} onChange={setSettings} /> : null}
 					<div className="flex flex-wrap gap-3">
 						{media.kind === 'unreadable' && media.reason === 'load' ? (
@@ -344,7 +352,8 @@ export default function Converter() {
 							<button
 								type="button"
 								onClick={convert}
-								disabled={busy || !range}
+								disabled={busy || !range || gifTooLong}
+								aria-describedby={gifTooLong ? PLAYBACK_LIMIT_ID : undefined}
 								className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-violet-600 disabled:cursor-not-allowed disabled:opacity-60"
 							>
 								Convert to GIF

@@ -3,6 +3,7 @@ import { fetchFile, toBlobURL } from '@ffmpeg/util';
 import type { ClipRange } from './clip-range';
 import { cropFilter, type Crop } from './crop';
 import { QUALITY_COLORS, type OutputSettings } from './output-settings';
+import { directionFilter, outputSec, speedFilter, type Playback } from './playback';
 import type { SourceVideo } from './video-file';
 
 // Still-frame previews stay small whatever output width is chosen.
@@ -210,6 +211,7 @@ export async function convertToGif(
 	range: ClipRange,
 	settings: OutputSettings,
 	crop: Crop | null,
+	playback: Playback,
 	onProgress?: (fraction: number) => void,
 ): Promise<Blob> {
 	await prepareInput(video);
@@ -219,14 +221,18 @@ export async function convertToGif(
 	// Crop first so Max width applies to the kept area.
 	const filter =
 		(crop ? `${cropFilter(crop)},` : '') +
+		speedFilter(playback) +
 		`fps=${fps},scale='min(${width},iw)':-1:flags=lanczos,` +
+		directionFilter(playback) +
 		`split[a][b];[a]palettegen=max_colors=${QUALITY_COLORS[quality]}[p];[b][p]paletteuse`;
 
 	const clipSec = range.endSec - range.startSec;
+	// Speed and boomerang make the GIF longer or shorter than the clip.
+	const gifSec = outputSec(range, playback);
 	const lines: string[] = [];
 	const collect = ({ message }: { message: string }) => lines.push(message);
 	// `time` is the output position in microseconds; -ss before -i makes it start at 0.
-	const report = ({ time }: { time: number }) => onProgress?.(Math.min(Math.max(time / 1e6 / clipSec, 0), 1));
+	const report = ({ time }: { time: number }) => onProgress?.(Math.min(Math.max(time / 1e6 / gifSec, 0), 1));
 	engine.on('log', collect);
 	engine.on('progress', report);
 
