@@ -316,16 +316,16 @@ export default function Converter() {
 	return (
 		<div className="flex flex-col gap-4">
 			{video && previewUrl ? (
-				<div className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-6">
+				<div className="flex flex-col gap-4 rounded-2xl border border-line bg-surface p-6 shadow-sm dark:shadow-none">
 					<div className="flex flex-col gap-1">
 						<h2
 							ref={selectedRef}
 							tabIndex={-1}
-							className="break-all text-lg font-semibold text-zinc-900 focus:outline-none"
+							className="break-all text-lg font-semibold text-fg focus:outline-none"
 						>
 							{video.name}
 						</h2>
-						<p className="text-sm text-zinc-600">
+						<p className="text-sm text-fg-muted">
 							{formatFileSize(video.sizeBytes)} · {video.format.toUpperCase()}
 						</p>
 					</div>
@@ -373,7 +373,7 @@ export default function Converter() {
 							<button
 								type="button"
 								onClick={readWithFfmpeg}
-								className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-violet-600"
+								className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-hover focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line"
 							>
 								Try again
 							</button>
@@ -383,7 +383,7 @@ export default function Converter() {
 								onClick={convert}
 								disabled={busy || !range || gifTooLong}
 								aria-describedby={gifTooLong ? PLAYBACK_LIMIT_ID : undefined}
-								className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-violet-600 disabled:cursor-not-allowed disabled:opacity-60"
+								className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-hover focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line disabled:cursor-not-allowed disabled:opacity-60"
 							>
 								Convert to GIF
 							</button>
@@ -392,7 +392,7 @@ export default function Converter() {
 							type="button"
 							onClick={chooseAnother}
 							disabled={busy}
-							className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-violet-600 disabled:cursor-not-allowed disabled:opacity-60"
+							className="rounded-lg border border-line-strong px-4 py-2 text-sm font-medium text-fg hover:bg-surface-muted focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line disabled:cursor-not-allowed disabled:opacity-60"
 						>
 							Choose another video
 						</button>
@@ -409,17 +409,17 @@ export default function Converter() {
 				/>
 			)}
 
-			<p id={ERROR_ID} role="alert" className="text-sm font-medium text-red-700 empty:hidden">
+			<p id={ERROR_ID} role="alert" className="text-sm font-medium text-danger-fg empty:hidden">
 				{errorText}
 			</p>
 			<div aria-live="polite" className="flex flex-col gap-1 text-sm font-medium empty:hidden">
-				{video && warning ? <p className="text-amber-800">{WARNING_MESSAGES[warning]}</p> : null}
+				{video && warning ? <p className="text-warning-fg">{WARNING_MESSAGES[warning]}</p> : null}
 				{video && statusText ? (
-					<p id={STATUS_ID} className="text-zinc-700">
+					<p id={STATUS_ID} className="text-fg-muted">
 						{statusText}
 					</p>
 				) : null}
-				{video && feedback?.tone === 'status' ? <p className="text-zinc-700">{feedback.text}</p> : null}
+				{video && feedback?.tone === 'status' ? <p className="text-fg-muted">{feedback.text}</p> : null}
 			</div>
 			{busy ? (
 				// Outside the live region so screen readers hear the status once, not every percent.
@@ -427,10 +427,10 @@ export default function Converter() {
 					<progress
 						aria-labelledby={STATUS_ID}
 						value={conversion === 'converting' ? progress : undefined}
-						className="h-2 w-full accent-violet-600"
+						className="h-2 w-full accent-accent"
 					/>
 					{conversion === 'converting' ? (
-						<span className="w-10 text-right text-sm font-medium tabular-nums text-zinc-700">
+						<span className="w-10 text-right text-sm font-medium tabular-nums text-fg-muted">
 							{Math.round(progress * 100)}%
 						</span>
 					) : null}

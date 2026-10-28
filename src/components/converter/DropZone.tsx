@@ -41,14 +41,14 @@ export default function DropZone({ title, hint, accept, onFiles, describedBy, bu
 				onDragLeave={handleDragLeave}
 				onDrop={handleDrop}
 				aria-describedby={describedBy}
-				className={`flex w-full flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-6 py-16 text-center transition-colors focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-violet-600 ${
+				className={`flex w-full flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-6 py-16 text-center transition-colors focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent-line ${
 					dragging
-						? 'border-violet-600 bg-violet-50'
-						: 'border-zinc-300 bg-white hover:border-violet-400'
+						? 'border-accent-line bg-accent-soft'
+						: 'border-line-strong bg-surface hover:border-accent-line'
 				}`}
 			>
-				<span className="text-lg font-semibold text-zinc-900">{title}</span>
-				<span className="text-sm text-zinc-600">{hint}</span>
+				<span className="text-lg font-semibold text-fg">{title}</span>
+				<span className="text-sm text-fg-muted">{hint}</span>
 			</button>
 			<input
 				ref={inputRef}

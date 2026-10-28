@@ -1,9 +1,9 @@
 # Coding Standards
 
 > Tuned by `/onboard` for the detected stack: Astro 7 (static output) + React 19
-> islands + TypeScript (strict) + Tailwind CSS v4, npm. The plans also choose
-> shadcn/ui, Lucide, and ffmpeg.wasm; none is installed yet, so add them as part
-> of the feature that first needs them.
+> islands + TypeScript (strict) + Tailwind CSS v4, npm, with ffmpeg.wasm and
+> Lucide icons (`lucide-react`). shadcn/ui is not used; the app keeps its own
+> small Tailwind components.
 
 ## TypeScript
 
@@ -66,8 +66,15 @@
   `tailwind.config.js`; compiled by the `@tailwindcss/vite` plugin in
   `astro.config.mjs`
 - No inline styles
-- > TODO: shadcn/ui setup, theme tokens, and the dark/light toggle arrive with
-  the UI features
+- Colors come only from the semantic tokens in `global.css` (`bg-page`,
+  `bg-surface`, `text-fg`, `text-fg-muted`, `border-line`, `bg-accent`,
+  `outline-accent-line`, and so on); each has a light and a dark value, so
+  components need no `dark:` color variants. Fixed colors are only for content
+  that looks the same in both themes (video letterbox, crop overlay, caption
+  swatches, white text on the accent)
+- Dark mode is `<html data-theme="dark">`, set before first paint by the inline
+  script in `Layout.astro`; use the `dark:` variant only for non-color
+  differences such as `dark:shadow-none`
 
 ## Data and Boundaries
 

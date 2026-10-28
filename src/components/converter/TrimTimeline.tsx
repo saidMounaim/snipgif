@@ -24,11 +24,11 @@ interface TrimTimelineProps {
 }
 
 const THUMB =
-	'[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-7 [&::-webkit-slider-thumb]:w-7 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-violet-600 [&::-webkit-slider-thumb]:shadow ' +
-	'[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:bg-violet-600 [&::-moz-range-thumb]:shadow';
+	'[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-7 [&::-webkit-slider-thumb]:w-7 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:shadow ' +
+	'[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:bg-accent [&::-moz-range-thumb]:shadow';
 
 // Two native range inputs share one track so keyboard and screen-reader support come for free.
-const SLIDER = `pointer-events-none absolute inset-0 h-11 w-full appearance-none bg-transparent focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-violet-600 disabled:opacity-60 ${THUMB}`;
+const SLIDER = `pointer-events-none absolute inset-0 h-11 w-full appearance-none bg-transparent focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line disabled:opacity-60 ${THUMB}`;
 
 // Dims everything outside the kept area; the box can be dragged along the crop's free axis.
 function CropOverlay({ crop, disabled, onChange }: { crop: Crop; disabled: boolean; onChange: (crop: Crop) => void }) {
@@ -129,7 +129,7 @@ function Frame({
 }) {
 	return (
 		<figure className="flex flex-1 flex-col gap-1">
-			<div className="flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-zinc-100 text-sm text-zinc-600">
+			<div className="flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-surface-muted text-sm text-fg-muted">
 				{preview.state === 'ready' ? (
 					// Sized to the picture's own shape inside the 16:9 box, so an overlay lines up with it.
 					<div
@@ -160,7 +160,7 @@ function Frame({
 					'Preview not available'
 				)}
 			</div>
-			<figcaption className="text-xs font-medium text-zinc-600">{label}</figcaption>
+			<figcaption className="text-xs font-medium text-fg-muted">{label}</figcaption>
 		</figure>
 	);
 }
@@ -310,9 +310,9 @@ export default function TrimTimeline({
 				<>
 					<div className="relative h-11">
 						{/* Inset by half a thumb so the highlight lines up with where native thumbs can travel. */}
-						<div className="absolute inset-x-3.5 top-1/2 h-2 -translate-y-1/2 rounded-full bg-zinc-200">
+						<div className="absolute inset-x-3.5 top-1/2 h-2 -translate-y-1/2 rounded-full bg-line">
 							<div
-								className="absolute inset-y-0 rounded-full bg-violet-500"
+								className="absolute inset-y-0 rounded-full bg-accent"
 								style={{ left: `${percent(range.startSec)}%`, width: `${percent(range.endSec - range.startSec)}%` }}
 							/>
 						</div>
@@ -351,7 +351,7 @@ export default function TrimTimeline({
 					</div>
 
 					<div className="flex flex-wrap items-center justify-between gap-3">
-						<p className="text-sm text-zinc-700">
+						<p className="text-sm text-fg-muted">
 							Selected {formatTime(range.startSec)} to {formatTime(range.endSec)} (
 							{(range.endSec - range.startSec).toFixed(1)} s)
 						</p>
@@ -360,7 +360,7 @@ export default function TrimTimeline({
 								type="button"
 								onClick={togglePlay}
 								disabled={disabled}
-								className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-violet-600 disabled:cursor-not-allowed disabled:opacity-60"
+								className="rounded-lg border border-line-strong px-4 py-2 text-sm font-medium text-fg hover:bg-surface-muted focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line disabled:cursor-not-allowed disabled:opacity-60"
 							>
 								{playing ? 'Pause' : 'Play selection'}
 							</button>

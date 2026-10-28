@@ -59,16 +59,16 @@ const STATUS_MESSAGES: Partial<Record<CompressionState, string>> = {
 const ERROR_ID = 'gif-upload-error';
 const STATUS_ID = 'compression-status';
 
-const FOCUS = 'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-violet-600';
+const FOCUS = 'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line';
 // Same visually hidden radio and 44 px label as the converter's Output settings.
 const CHOICE =
-	'flex min-h-11 cursor-pointer items-center rounded-lg border border-zinc-300 px-4 text-sm font-medium text-zinc-900 hover:bg-zinc-50 ' +
-	'has-checked:border-violet-600 has-checked:bg-violet-50 has-checked:text-violet-800 ' +
-	'has-focus-visible:outline-4 has-focus-visible:outline-offset-2 has-focus-visible:outline-violet-600 ' +
+	'flex min-h-11 cursor-pointer items-center rounded-lg border border-line-strong px-4 text-sm font-medium text-fg hover:bg-surface-muted ' +
+	'has-checked:border-accent-line has-checked:bg-accent-soft has-checked:text-accent-fg ' +
+	'has-focus-visible:outline-4 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent-line ' +
 	'has-disabled:cursor-not-allowed has-disabled:opacity-60';
-const SLIDER = `h-11 w-full cursor-pointer accent-violet-600 disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS}`;
-const PRIMARY = `rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS}`;
-const SECONDARY = `rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS}`;
+const SLIDER = `h-11 w-full cursor-pointer accent-accent disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS}`;
+const PRIMARY = `rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS}`;
+const SECONDARY = `rounded-lg border border-line-strong px-4 py-2 text-sm font-medium text-fg hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS}`;
 
 function sizeChange(before: number, after: number): string {
 	const percent = Math.round((Math.abs(before - after) / before) * 100);
@@ -216,16 +216,16 @@ export default function Compressor() {
 	return (
 		<div className="flex flex-col gap-4">
 			{gif && originalUrl ? (
-				<div className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-6">
+				<div className="flex flex-col gap-4 rounded-2xl border border-line bg-surface p-6 shadow-sm dark:shadow-none">
 					<div className="flex flex-col gap-1">
 						<h2
 							ref={selectedRef}
 							tabIndex={-1}
-							className="break-all text-lg font-semibold text-zinc-900 focus:outline-none"
+							className="break-all text-lg font-semibold text-fg focus:outline-none"
 						>
 							{gif.name}
 						</h2>
-						<p className="text-sm text-zinc-600">
+						<p className="text-sm text-fg-muted">
 							{formatFileSize(gif.sizeBytes)}
 							{source.state === 'ready' ? ` · ${source.width} × ${source.height}` : null}
 						</p>
@@ -236,16 +236,16 @@ export default function Compressor() {
 							alt={`Original GIF: ${gif.name}`}
 							onLoad={(event) => handleLoad(event.currentTarget.naturalWidth, event.currentTarget.naturalHeight)}
 							onError={() => setSource({ state: 'unreadable' })}
-							className="h-auto max-h-72 max-w-full self-center rounded-xl border border-zinc-200"
+							className="h-auto max-h-72 max-w-full self-center rounded-xl border border-line"
 						/>
 					) : null}
 
 					{settings && source.state === 'ready' ? (
-						<div className="flex flex-col gap-4 border-t border-zinc-200 pt-4">
-							<h3 className="text-base font-semibold text-zinc-900">Compression settings</h3>
+						<div className="flex flex-col gap-4 border-t border-line pt-4">
+							<h3 className="text-base font-semibold text-fg">Compression settings</h3>
 
 							<fieldset disabled={busy} className="flex flex-col gap-2">
-								<legend className="mb-2 text-sm font-medium text-zinc-900">Colors</legend>
+								<legend className="mb-2 text-sm font-medium text-fg">Colors</legend>
 								<div className="flex flex-wrap gap-2">
 									{COLOR_CHOICES.map((colors) => (
 										<label key={colors} className={CHOICE}>
@@ -264,7 +264,7 @@ export default function Compressor() {
 							</fieldset>
 
 							<fieldset disabled={busy} className="flex flex-col gap-2">
-								<legend className="mb-2 text-sm font-medium text-zinc-900">Frames</legend>
+								<legend className="mb-2 text-sm font-medium text-fg">Frames</legend>
 								<div className="flex flex-wrap gap-2">
 									{(Object.keys(FRAME_STEPS).map(Number) as FrameStep[]).map((frameStep) => (
 										<label key={frameStep} className={CHOICE}>
@@ -284,10 +284,10 @@ export default function Compressor() {
 
 							<div className="flex flex-col gap-1">
 								<div className="flex items-center justify-between text-sm">
-									<label htmlFor="gif-width" className="font-medium text-zinc-900">
+									<label htmlFor="gif-width" className="font-medium text-fg">
 										Max width
 									</label>
-									<span className="text-zinc-700">
+									<span className="text-fg-muted">
 										{settings.width === source.width ? `Original (${source.width} px)` : `${settings.width} px`}
 									</span>
 								</div>
@@ -329,19 +329,19 @@ export default function Compressor() {
 				/>
 			)}
 
-			<p id={ERROR_ID} role="alert" className="text-sm font-medium text-red-700 empty:hidden">
+			<p id={ERROR_ID} role="alert" className="text-sm font-medium text-danger-fg empty:hidden">
 				{errorText}
 			</p>
 			<div aria-live="polite" className="flex flex-col gap-1 text-sm font-medium empty:hidden">
-				{gif && warning ? <p className="text-amber-800">{WARNING_MESSAGES[warning]}</p> : null}
+				{gif && warning ? <p className="text-warning-fg">{WARNING_MESSAGES[warning]}</p> : null}
 				{gif && statusText ? (
-					<p id={STATUS_ID} className="text-zinc-700">
+					<p id={STATUS_ID} className="text-fg-muted">
 						{statusText}
 					</p>
 				) : null}
-				{gif && feedback?.tone === 'status' ? <p className="text-zinc-700">{feedback.text}</p> : null}
+				{gif && feedback?.tone === 'status' ? <p className="text-fg-muted">{feedback.text}</p> : null}
 			</div>
-			{busy ? <progress aria-labelledby={STATUS_ID} className="h-2 w-full accent-violet-600" /> : null}
+			{busy ? <progress aria-labelledby={STATUS_ID} className="h-2 w-full accent-accent" /> : null}
 
 			{gif && result ? (
 				<GifResult
@@ -350,8 +350,8 @@ export default function Compressor() {
 					alt={`Compressed GIF: ${gif.name}`}
 					onFeedback={setFeedback}
 				>
-					<p className="text-sm font-medium text-zinc-900">{sizeChange(gif.sizeBytes, result.sizeBytes)}</p>
-					{result.sizeBytes >= gif.sizeBytes ? <p className="text-sm text-amber-800">{LARGER_NOTE}</p> : null}
+					<p className="text-sm font-medium text-fg">{sizeChange(gif.sizeBytes, result.sizeBytes)}</p>
+					{result.sizeBytes >= gif.sizeBytes ? <p className="text-sm text-warning-fg">{LARGER_NOTE}</p> : null}
 				</GifResult>
 			) : null}
 		</div>

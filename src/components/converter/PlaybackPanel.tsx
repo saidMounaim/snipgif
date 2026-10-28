@@ -14,9 +14,9 @@ const BOOMERANG_HINT_ID = 'boomerang-hint';
 
 // Same visually hidden input and 44 px label as Output settings.
 const CHOICE =
-	'flex min-h-11 cursor-pointer items-center rounded-lg border border-zinc-300 px-4 text-sm font-medium text-zinc-900 hover:bg-zinc-50 ' +
-	'has-checked:border-violet-600 has-checked:bg-violet-50 has-checked:text-violet-800 ' +
-	'has-focus-visible:outline-4 has-focus-visible:outline-offset-2 has-focus-visible:outline-violet-600 ' +
+	'flex min-h-11 cursor-pointer items-center rounded-lg border border-line-strong px-4 text-sm font-medium text-fg hover:bg-surface-muted ' +
+	'has-checked:border-accent-line has-checked:bg-accent-soft has-checked:text-accent-fg ' +
+	'has-focus-visible:outline-4 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent-line ' +
 	'has-disabled:cursor-not-allowed has-disabled:opacity-60';
 
 export default function PlaybackPanel({ playback, range, disabled, onChange }: PlaybackPanelProps) {
@@ -26,11 +26,11 @@ export default function PlaybackPanel({ playback, range, disabled, onChange }: P
 		: 'Shorten the clip or choose a faster speed.';
 
 	return (
-		<div className="flex flex-col gap-4 border-t border-zinc-200 pt-4">
-			<h3 className="text-base font-semibold text-zinc-900">Playback</h3>
+		<div className="flex flex-col gap-4 border-t border-line pt-4">
+			<h3 className="text-base font-semibold text-fg">Playback</h3>
 
 			<fieldset disabled={disabled} className="flex flex-col gap-2">
-				<legend className="mb-2 text-sm font-medium text-zinc-900">Speed</legend>
+				<legend className="mb-2 text-sm font-medium text-fg">Speed</legend>
 				<div className="flex flex-wrap gap-2">
 					{SPEEDS.map((speed) => (
 						<label key={speed} className={CHOICE}>
@@ -71,15 +71,15 @@ export default function PlaybackPanel({ playback, range, disabled, onChange }: P
 						Boomerang
 					</label>
 				</div>
-				<p id={BOOMERANG_HINT_ID} className="text-xs text-zinc-600">
+				<p id={BOOMERANG_HINT_ID} className="text-xs text-fg-muted">
 					Boomerang plays forward, then backward.
 				</p>
 			</fieldset>
 
-			<p className="text-sm text-zinc-700">GIF length: {length}</p>
+			<p className="text-sm text-fg-muted">GIF length: {length}</p>
 			<div aria-live="polite" className="empty:hidden">
 				{tooLong(range, playback) ? (
-					<p id={PLAYBACK_LIMIT_ID} className="text-sm font-medium text-red-700">
+					<p id={PLAYBACK_LIMIT_ID} className="text-sm font-medium text-danger-fg">
 						This GIF would be {length} long. The limit is {formatTime(CLIP_LIMITS.maxSec)}. {fixes}
 					</p>
 				) : null}

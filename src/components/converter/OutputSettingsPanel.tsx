@@ -17,26 +17,26 @@ interface OutputSettingsPanelProps {
 const QUALITY_LABELS: Record<Quality, string> = { low: 'Low', medium: 'Medium', high: 'High' };
 const WIDTH_HINT_ID = 'output-width-hint';
 
-const FOCUS = 'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-violet-600';
+const FOCUS = 'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line';
 // The native input is visually hidden; its label is the visible, 44 px tall touch target.
 const CHOICE =
-	'flex min-h-11 cursor-pointer items-center rounded-lg border border-zinc-300 px-4 text-sm font-medium text-zinc-900 hover:bg-zinc-50 ' +
-	'has-checked:border-violet-600 has-checked:bg-violet-50 has-checked:text-violet-800 ' +
-	'has-focus-visible:outline-4 has-focus-visible:outline-offset-2 has-focus-visible:outline-violet-600 ' +
+	'flex min-h-11 cursor-pointer items-center rounded-lg border border-line-strong px-4 text-sm font-medium text-fg hover:bg-surface-muted ' +
+	'has-checked:border-accent-line has-checked:bg-accent-soft has-checked:text-accent-fg ' +
+	'has-focus-visible:outline-4 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent-line ' +
 	'has-disabled:cursor-not-allowed has-disabled:opacity-60';
-const SLIDER = `h-11 w-full cursor-pointer accent-violet-600 disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS}`;
+const SLIDER = `h-11 w-full cursor-pointer accent-accent disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS}`;
 
 export default function OutputSettingsPanel({ settings, disabled, onChange }: OutputSettingsPanelProps) {
 	const { fps, width } = SETTING_LIMITS;
 
 	return (
-		<div className="flex flex-col gap-4 border-t border-zinc-200 pt-4">
-			<h3 className="text-base font-semibold text-zinc-900">Output settings</h3>
+		<div className="flex flex-col gap-4 border-t border-line pt-4">
+			<h3 className="text-base font-semibold text-fg">Output settings</h3>
 
 			<fieldset disabled={disabled} className="flex flex-col gap-2">
-				<legend className="mb-2 text-sm font-medium text-zinc-900">
+				<legend className="mb-2 text-sm font-medium text-fg">
 					Preset
-					{settings.preset === null ? <span className="ml-2 font-normal text-zinc-600">Custom</span> : null}
+					{settings.preset === null ? <span className="ml-2 font-normal text-fg-muted">Custom</span> : null}
 				</legend>
 				<div className="flex flex-wrap gap-2">
 					{(Object.keys(PRESETS) as PresetId[]).map((id) => (
@@ -57,10 +57,10 @@ export default function OutputSettingsPanel({ settings, disabled, onChange }: Ou
 
 			<div className="flex flex-col gap-1">
 				<div className="flex items-center justify-between text-sm">
-					<label htmlFor="output-fps" className="font-medium text-zinc-900">
+					<label htmlFor="output-fps" className="font-medium text-fg">
 						Frames per second
 					</label>
-					<span className="text-zinc-700">{settings.fps} fps</span>
+					<span className="text-fg-muted">{settings.fps} fps</span>
 				</div>
 				<input
 					id="output-fps"
@@ -78,10 +78,10 @@ export default function OutputSettingsPanel({ settings, disabled, onChange }: Ou
 
 			<div className="flex flex-col gap-1">
 				<div className="flex items-center justify-between text-sm">
-					<label htmlFor="output-width" className="font-medium text-zinc-900">
+					<label htmlFor="output-width" className="font-medium text-fg">
 						Max width
 					</label>
-					<span className="text-zinc-700">{settings.width} px</span>
+					<span className="text-fg-muted">{settings.width} px</span>
 				</div>
 				<input
 					id="output-width"
@@ -96,13 +96,13 @@ export default function OutputSettingsPanel({ settings, disabled, onChange }: Ou
 					onChange={(event) => onChange(changeSetting(settings, { width: Number(event.currentTarget.value) }))}
 					className={SLIDER}
 				/>
-				<p id={WIDTH_HINT_ID} className="text-xs text-zinc-600">
+				<p id={WIDTH_HINT_ID} className="text-xs text-fg-muted">
 					Smaller videos keep their own size.
 				</p>
 			</div>
 
 			<fieldset disabled={disabled} className="flex flex-col gap-2">
-				<legend className="mb-2 text-sm font-medium text-zinc-900">Quality</legend>
+				<legend className="mb-2 text-sm font-medium text-fg">Quality</legend>
 				<div className="flex flex-wrap gap-2">
 					{(Object.keys(QUALITY_LABELS) as Quality[]).map((quality) => (
 						<label key={quality} className={CHOICE}>

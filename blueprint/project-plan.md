@@ -82,7 +82,7 @@ What is stored:
   easily, has built-in i18n routing, and content collections for the blog
 - **Interactive converter:** React component loaded as an Astro island, so only
   the converter page ships JavaScript
-- **Styling:** Tailwind CSS with shadcn/ui components
+- **Styling:** Tailwind CSS with the app's own small components (no shadcn/ui)
 - **Video processing:** ffmpeg.wasm, using the **single-threaded core**. The
   multi-threaded core needs COOP/COEP headers, which break Google AdSense ads.
 - **ffmpeg core hosting:** loaded on demand from jsDelivr CDN (the core file is

@@ -1,1 +1,68 @@
 @import "tailwindcss";
+
+/* Dark styles apply under <html data-theme="dark">, set by the inline script in Layout.astro. */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@font-face {
+	font-family: 'Inter Variable';
+	src: url('/fonts/inter-latin-wght.woff2') format('woff2');
+	font-weight: 100 900;
+	font-display: swap;
+}
+
+/* Light values are the defaults; dark overrides them. Text pairs meet WCAG AA in both. */
+:root {
+	color-scheme: light;
+	--page: #fafafa;
+	--surface: #ffffff;
+	--surface-muted: #f4f4f5;
+	--fg: #18181b;
+	--fg-muted: #52525b;
+	--line: #e4e4e7;
+	/* Control borders need 3:1 against the surface. */
+	--line-strong: #8a8a93;
+	--accent: #7c3aed;
+	--accent-hover: #6d28d9;
+	--accent-fg: #6d28d9;
+	--accent-soft: #ede9fe;
+	/* Focus rings and checked borders: 3:1 against page and surface. */
+	--accent-line: #7c3aed;
+	--danger-fg: #b91c1c;
+	--warning-fg: #92400e;
+}
+
+[data-theme='dark'] {
+	color-scheme: dark;
+	--page: #09090b;
+	--surface: #18181b;
+	--surface-muted: #27272a;
+	--fg: #fafafa;
+	--fg-muted: #a1a1aa;
+	--line: #27272a;
+	--line-strong: #71717a;
+	--accent: #7c3aed;
+	--accent-hover: #6d28d9;
+	--accent-fg: #c4b5fd;
+	--accent-soft: #2e1065;
+	--accent-line: #a78bfa;
+	--danger-fg: #f87171;
+	--warning-fg: #fbbf24;
+}
+
+@theme inline {
+	--font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+	--color-page: var(--page);
+	--color-surface: var(--surface);
+	--color-surface-muted: var(--surface-muted);
+	--color-fg: var(--fg);
+	--color-fg-muted: var(--fg-muted);
+	--color-line: var(--line);
+	--color-line-strong: var(--line-strong);
+	--color-accent: var(--accent);
+	--color-accent-hover: var(--accent-hover);
+	--color-accent-fg: var(--accent-fg);
+	--color-accent-soft: var(--accent-soft);
+	--color-accent-line: var(--accent-line);
+	--color-danger-fg: var(--danger-fg);
+	--color-warning-fg: var(--warning-fg);
+}

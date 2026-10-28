@@ -18,14 +18,14 @@ interface TextPanelProps {
 	onChange: (caption: Caption) => void;
 }
 
-const FOCUS = 'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-violet-600';
+const FOCUS = 'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line';
 // Same visually hidden radio and 44 px label as Output settings.
 const CHOICE =
-	'flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-zinc-300 px-4 text-sm font-medium text-zinc-900 hover:bg-zinc-50 ' +
-	'has-checked:border-violet-600 has-checked:bg-violet-50 has-checked:text-violet-800 ' +
-	'has-focus-visible:outline-4 has-focus-visible:outline-offset-2 has-focus-visible:outline-violet-600 ' +
+	'flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-line-strong px-4 text-sm font-medium text-fg hover:bg-surface-muted ' +
+	'has-checked:border-accent-line has-checked:bg-accent-soft has-checked:text-accent-fg ' +
+	'has-focus-visible:outline-4 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent-line ' +
 	'has-disabled:cursor-not-allowed has-disabled:opacity-60';
-const INPUT = `min-h-11 w-full rounded-lg border border-zinc-300 px-3 text-sm text-zinc-900 disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS}`;
+const INPUT = `min-h-11 w-full rounded-lg border border-line-strong px-3 text-sm text-fg disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS}`;
 const NOTE_ID = 'text-note';
 
 export default function TextPanel({ caption, unavailable, disabled, onChange }: TextPanelProps) {
@@ -35,10 +35,10 @@ export default function TextPanel({ caption, unavailable, disabled, onChange }: 
 	}, []);
 
 	return (
-		<div className="flex flex-col gap-4 border-t border-zinc-200 pt-4">
-			<h3 className="text-base font-semibold text-zinc-900">Text</h3>
+		<div className="flex flex-col gap-4 border-t border-line pt-4">
+			<h3 className="text-base font-semibold text-fg">Text</h3>
 			{unavailable ? (
-				<p id={NOTE_ID} className="text-xs text-zinc-600">
+				<p id={NOTE_ID} className="text-xs text-fg-muted">
 					Text isn't available for this video.
 				</p>
 			) : null}
@@ -51,7 +51,7 @@ export default function TextPanel({ caption, unavailable, disabled, onChange }: 
 				<div className="grid gap-3 sm:grid-cols-2">
 					{(['top', 'bottom'] as const).map((edge) => (
 						<div key={edge} className="flex flex-col gap-1">
-							<label htmlFor={`caption-${edge}`} className="text-sm font-medium text-zinc-900">
+							<label htmlFor={`caption-${edge}`} className="text-sm font-medium text-fg">
 								{edge === 'top' ? 'Top text' : 'Bottom text'}
 							</label>
 							<input
@@ -66,7 +66,7 @@ export default function TextPanel({ caption, unavailable, disabled, onChange }: 
 				</div>
 
 				<fieldset className="flex flex-col gap-2">
-					<legend className="mb-2 text-sm font-medium text-zinc-900">Font</legend>
+					<legend className="mb-2 text-sm font-medium text-fg">Font</legend>
 					<div className="flex flex-wrap gap-2">
 						{(Object.keys(CAPTION_FONTS) as CaptionFont[]).map((font) => (
 							<label key={font} className={CHOICE} style={{ font: fontSpec(font, 14) }}>
@@ -85,7 +85,7 @@ export default function TextPanel({ caption, unavailable, disabled, onChange }: 
 				</fieldset>
 
 				<fieldset className="flex flex-col gap-2">
-					<legend className="mb-2 text-sm font-medium text-zinc-900">Color</legend>
+					<legend className="mb-2 text-sm font-medium text-fg">Color</legend>
 					<div className="flex flex-wrap gap-2">
 						{(Object.keys(CAPTION_COLORS) as CaptionColor[]).map((color) => (
 							<label key={color} className={CHOICE}>
@@ -99,7 +99,7 @@ export default function TextPanel({ caption, unavailable, disabled, onChange }: 
 								/>
 								<span
 									aria-hidden="true"
-									className="h-4 w-4 rounded-full border border-zinc-400"
+									className="h-4 w-4 rounded-full border border-line-strong"
 									style={{ backgroundColor: CAPTION_COLORS[color].fill }}
 								/>
 								{CAPTION_COLORS[color].label}
@@ -109,7 +109,7 @@ export default function TextPanel({ caption, unavailable, disabled, onChange }: 
 				</fieldset>
 
 				<fieldset className="flex flex-col gap-2">
-					<legend className="mb-2 text-sm font-medium text-zinc-900">Size</legend>
+					<legend className="mb-2 text-sm font-medium text-fg">Size</legend>
 					<div className="flex flex-wrap gap-2">
 						{(Object.keys(CAPTION_SIZES) as CaptionSize[]).map((size) => (
 							<label key={size} className={CHOICE}>
