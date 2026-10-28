@@ -21,7 +21,7 @@ Start with your first real slice of functionality.
 - [x] 3. **Trim and clip selection** - Timeline with video preview where users pick start and end points for the GIF.
 - [x] 4. **Output settings and presets** - FPS, width, and quality controls, with one-click presets like "Small for chat", "Balanced", and "High quality".
 - [x] 5. **GIF preview and download** - Show the finished GIF with its file size, then download, copy to clipboard, or share via the Web Share API.
-- [ ] 6. **Progress and error handling** - Progress bar during conversion and friendly messages for unsupported files or low-memory devices.
+- [x] 6. **Progress and error handling** - Progress bar during conversion and friendly messages for unsupported files or low-memory devices.
 - [ ] 7. **Crop and resize** - Crop the frame with an aspect-ratio picker (1:1, 16:9, 9:16) for social media formats.
 - [ ] 8. **Speed, reverse, and boomerang** - Change playback speed, reverse the clip, or create a back-and-forth loop.
 - [ ] 9. **Text and caption overlay** - Add meme-style text with font, color, and position options.

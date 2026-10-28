@@ -18,19 +18,21 @@ import {
 	extractFrame,
 	type GifResult as GifResultData,
 	loadGifEngine,
+	MemoryError,
 	prepareInput,
 	probeDuration,
 	releaseInput,
+	UnsupportedVideoError,
 } from '../../lib/gif-engine';
 
 type ConversionState = 'idle' | 'loading-core' | 'converting' | 'done' | 'error';
-type ConversionError = 'load' | 'convert';
+type ConversionError = 'load' | 'memory' | 'unsupported' | 'convert';
 type MediaState =
 	| { kind: 'checking' }
 	| { kind: 'probing' }
 	| { kind: 'playable'; durationSec: number }
 	| { kind: 'frames'; durationSec: number }
-	| { kind: 'unreadable'; reason: 'load' | 'read' };
+	| { kind: 'unreadable'; reason: 'load' | 'memory' | 'read' };
 
 const ERROR_MESSAGES: Record<VideoFileError, string> = {
 	multiple: 'Please drop one video at a time.',
@@ -46,10 +48,14 @@ const WARNING_MESSAGES: Record<VideoFileWarning, string> = {
 
 const CONVERSION_ERROR_MESSAGES: Record<ConversionError, string> = {
 	load: "The converter couldn't load. Check your connection and try again.",
+	memory:
+		'Your device ran out of memory making this GIF. Try a shorter clip, a smaller width, or the Small for chat preset.',
+	unsupported: "We can't convert this video's contents, even though the file type is supported. Try another video.",
 	convert: 'Something went wrong converting this video. Please try another video.',
 };
 
 const READ_ERROR_MESSAGE = "We couldn't read this video. Please try another video.";
+const READ_MEMORY_MESSAGE = "This video is too large for your device's memory. Try a shorter or smaller video.";
 
 const STATUS_MESSAGES: Partial<Record<ConversionState, string>> = {
 	'loading-core': 'Getting the converter ready...',
@@ -59,6 +65,7 @@ const STATUS_MESSAGES: Partial<Record<ConversionState, string>> = {
 
 const FRAME_DEBOUNCE_MS = 300;
 const ERROR_ID = 'video-upload-error';
+const STATUS_ID = 'conversion-status';
 const LOADING_FRAMES = { start: { state: 'loading' }, end: { state: 'loading' } } as const;
 
 export default function Converter() {
@@ -67,6 +74,7 @@ export default function Converter() {
 	const [warning, setWarning] = useState<VideoFileWarning | null>(null);
 	const [conversion, setConversion] = useState<ConversionState>('idle');
 	const [conversionError, setConversionError] = useState<ConversionError | null>(null);
+	const [progress, setProgress] = useState(0);
 	const [gif, setGif] = useState<GifResultData | null>(null);
 	const [feedback, setFeedback] = useState<ResultFeedback | null>(null);
 	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -224,7 +232,8 @@ export default function Converter() {
 			setRange(defaultRange(seconds));
 		} catch (caught) {
 			if (selection !== selectionRef.current) return;
-			setMedia({ kind: 'unreadable', reason: caught instanceof EngineLoadError ? 'load' : 'read' });
+			const reason = caught instanceof EngineLoadError ? 'load' : caught instanceof MemoryError ? 'memory' : 'read';
+			setMedia({ kind: 'unreadable', reason });
 		}
 	}
 
@@ -232,16 +241,27 @@ export default function Converter() {
 		if (!video || !range) return;
 		replaceGif(null);
 		setConversionError(null);
+		setProgress(0);
 		try {
 			setConversion('loading-core');
 			await loadGifEngine();
 			setConversion('converting');
-			const blob = await convertToGif(video, range, settings);
+			const blob = await convertToGif(video, range, settings, (fraction) =>
+				setProgress((current) => Math.max(current, fraction)),
+			);
 			replaceGif({ blob, objectUrl: URL.createObjectURL(blob), sizeBytes: blob.size });
 			setConversion('done');
 		} catch (caught) {
 			setConversion('error');
-			setConversionError(caught instanceof EngineLoadError ? 'load' : 'convert');
+			setConversionError(
+				caught instanceof EngineLoadError
+					? 'load'
+					: caught instanceof MemoryError
+						? 'memory'
+						: caught instanceof UnsupportedVideoError
+							? 'unsupported'
+							: 'convert',
+			);
 		}
 	}
 
@@ -251,7 +271,9 @@ export default function Converter() {
 		: media.kind === 'unreadable'
 			? media.reason === 'load'
 				? CONVERSION_ERROR_MESSAGES.load
-				: READ_ERROR_MESSAGE
+				: media.reason === 'memory'
+					? READ_MEMORY_MESSAGE
+					: READ_ERROR_MESSAGE
 			: conversionError
 				? CONVERSION_ERROR_MESSAGES[conversionError]
 				: feedback?.tone === 'error'
@@ -327,9 +349,28 @@ export default function Converter() {
 			</p>
 			<div aria-live="polite" className="flex flex-col gap-1 text-sm font-medium empty:hidden">
 				{video && warning ? <p className="text-amber-800">{WARNING_MESSAGES[warning]}</p> : null}
-				{video && statusText ? <p className="text-zinc-700">{statusText}</p> : null}
+				{video && statusText ? (
+					<p id={STATUS_ID} className="text-zinc-700">
+						{statusText}
+					</p>
+				) : null}
 				{video && feedback?.tone === 'status' ? <p className="text-zinc-700">{feedback.text}</p> : null}
 			</div>
+			{busy ? (
+				// Outside the live region so screen readers hear the status once, not every percent.
+				<div className="flex items-center gap-3">
+					<progress
+						aria-labelledby={STATUS_ID}
+						value={conversion === 'converting' ? progress : undefined}
+						className="h-2 w-full accent-violet-600"
+					/>
+					{conversion === 'converting' ? (
+						<span className="w-10 text-right text-sm font-medium tabular-nums text-zinc-700">
+							{Math.round(progress * 100)}%
+						</span>
+					) : null}
+				</div>
+			) : null}
 
 			{video && gif ? <GifResult result={gif} videoName={video.name} onFeedback={setFeedback} /> : null}
 		</div>
