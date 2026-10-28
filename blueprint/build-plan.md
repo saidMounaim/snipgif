@@ -17,7 +17,7 @@ Start with your first real slice of functionality.
 ## Your features
 
 - [x] 1. **Video upload** - Drag-and-drop or file picker for MP4, MOV, WebM, and AVI with size and format validation.
-- [ ] 2. **In-browser conversion engine** - Convert video to GIF on the user's device with ffmpeg.wasm, so files are never uploaded to a server (fast, private, and nearly free to host).
+- [x] 2. **In-browser conversion engine** - Convert video to GIF on the user's device with ffmpeg.wasm, so files are never uploaded to a server (fast, private, and nearly free to host).
 - [ ] 3. **Trim and clip selection** - Timeline with video preview where users pick start and end points for the GIF.
 - [ ] 4. **Output settings and presets** - FPS, width, and quality controls, with one-click presets like "Small for chat", "Balanced", and "High quality".
 - [ ] 5. **GIF preview and download** - Show the finished GIF with its file size, then download, copy to clipboard, or share via the Web Share API.
