@@ -1,8 +1,9 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
+import type { ClipRange } from './clip-range';
 import type { SourceVideo } from './video-file';
 
-export const GIF_SETTINGS = { fps: 10, maxWidth: 480, maxSeconds: 30 } as const;
+export const GIF_SETTINGS = { fps: 10, maxWidth: 480 } as const;
 
 // Single-threaded core: the multi-threaded one needs COOP/COEP headers, which break AdSense.
 const CORE_BASE_URL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm';
@@ -12,6 +13,7 @@ export class ConversionError extends Error {}
 
 let ffmpeg: FFmpeg | null = null;
 let loading: Promise<FFmpeg> | null = null;
+let input: { video: SourceVideo; name: string; ready: Promise<void> } | null = null;
 
 async function createEngine(): Promise<FFmpeg> {
 	const instance = new FFmpeg();
@@ -43,32 +45,113 @@ export async function loadGifEngine(): Promise<void> {
 	await getEngine();
 }
 
-export async function convertToGif(video: SourceVideo): Promise<Blob> {
-	const engine = await getEngine();
-	const input = `input.${video.format}`;
+// The selected video is written to the virtual FS once and reused by probe, frames, and conversion.
+export async function prepareInput(video: SourceVideo): Promise<void> {
+	if (input?.video === video) return input.ready;
+	await releaseInput();
+	const name = `input.${video.format}`;
+	const ready = getEngine().then(async (engine) => {
+		await engine.writeFile(name, await fetchFile(video.file));
+	});
+	const current = { video, name, ready };
+	input = current;
+	ready.catch(() => {
+		if (input === current) input = null;
+	});
+	return ready;
+}
+
+export async function releaseInput(): Promise<void> {
+	if (!input) return;
+	const { name, ready } = input;
+	input = null;
+	await ready.catch(() => {});
+	if (ffmpeg) await ffmpeg.deleteFile(name).catch(() => {});
+}
+
+async function currentInput(): Promise<{ engine: FFmpeg; name: string }> {
+	if (!input) throw new ConversionError('no video prepared');
+	const { name, ready } = input;
+	await ready;
+	return { engine: await getEngine(), name };
+}
+
+async function readAndDelete(engine: FFmpeg, path: string): Promise<Uint8Array | null> {
+	const data = await engine.readFile(path).catch(() => null);
+	await engine.deleteFile(path).catch(() => {});
+	return data instanceof Uint8Array && data.length > 0 ? data : null;
+}
+
+export async function probeDuration(): Promise<number> {
+	const { engine, name } = await currentInput();
+	const report = 'duration.txt';
+	const probed = await engine
+		.ffprobe(['-v', 'error', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', name, '-o', report])
+		.then(() => readAndDelete(engine, report))
+		.catch(() => null);
+	let duration = probed ? Number.parseFloat(new TextDecoder().decode(probed)) : Number.NaN;
+
+	if (!(duration > 0)) {
+		// Fallback for cores without ffprobe: ffmpeg prints "Duration: 00:01:02.50" for any input.
+		const lines: string[] = [];
+		const collect = ({ message }: { message: string }) => lines.push(message);
+		engine.on('log', collect);
+		await engine.exec(['-hide_banner', '-i', name]).catch(() => {});
+		engine.off('log', collect);
+		const match = lines.join('\n').match(/Duration: (\d+):(\d+):(\d+(?:\.\d+)?)/);
+		duration = match ? Number(match[1]) * 3600 + Number(match[2]) * 60 + Number(match[3]) : Number.NaN;
+	}
+
+	if (!(duration > 0) || !Number.isFinite(duration)) {
+		throw new ConversionError('could not read video duration');
+	}
+	return duration;
+}
+
+let frameCount = 0;
+
+export async function extractFrame(atSec: number): Promise<Blob> {
+	const { engine, name } = await currentInput();
+	// Unique per call: overlapping requests interleave their exec/read/delete messages.
+	const output = `frame-${++frameCount}.jpg`;
+	const { maxWidth } = GIF_SETTINGS;
+	await engine.exec([
+		'-ss', atSec.toFixed(1),
+		'-i', name,
+		'-frames:v', '1',
+		'-vf', `scale='min(${maxWidth},iw)':-1`,
+		'-q:v', '4',
+		output,
+	]);
+	const data = await readAndDelete(engine, output);
+	if (!data) throw new ConversionError('ffmpeg produced no frame');
+	return new Blob([data as Uint8Array<ArrayBuffer>], { type: 'image/jpeg' });
+}
+
+export async function convertToGif(video: SourceVideo, range: ClipRange): Promise<Blob> {
+	await prepareInput(video);
+	const { engine, name } = await currentInput();
 	const output = 'output.gif';
-	const { fps, maxWidth, maxSeconds } = GIF_SETTINGS;
+	const { fps, maxWidth } = GIF_SETTINGS;
 	const filter =
 		`fps=${fps},scale='min(${maxWidth},iw)':-1:flags=lanczos,` +
 		'split[a][b];[a]palettegen[p];[b][p]paletteuse';
 
 	try {
-		await engine.writeFile(input, await fetchFile(video.file));
 		const exitCode = await engine.exec([
-			'-t', String(maxSeconds),
-			'-i', input,
+			'-ss', range.startSec.toFixed(1),
+			'-t', (range.endSec - range.startSec).toFixed(1),
+			'-i', name,
 			'-vf', filter,
 			'-loop', '0',
 			output,
 		]);
 		if (exitCode !== 0) throw new ConversionError(`ffmpeg exited with code ${exitCode}`);
-
-		const data = await engine.readFile(output).catch(() => null);
-		if (!(data instanceof Uint8Array) || data.length === 0) {
-			throw new ConversionError('ffmpeg produced no GIF');
-		}
-		return new Blob([data as Uint8Array<ArrayBuffer>], { type: 'image/gif' });
-	} finally {
-		await Promise.allSettled([engine.deleteFile(input), engine.deleteFile(output)]);
+	} catch (error) {
+		await engine.deleteFile(output).catch(() => {});
+		throw error;
 	}
+	const data = await readAndDelete(engine, output);
+	if (!data) throw new ConversionError('ffmpeg produced no GIF');
+	return new Blob([data as Uint8Array<ArrayBuffer>], { type: 'image/gif' });
 }
