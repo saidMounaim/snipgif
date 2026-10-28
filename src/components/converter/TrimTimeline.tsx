@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type PointerEvent, type ReactNode, type SyntheticEvent } from 'react';
 import { CLIP_LIMITS, formatTime, lastFrameSec, moveEnd, moveStart, type ClipRange } from '../../lib/clip-range';
 import { cropAxis, cropPosition, moveCrop, type Crop, type FrameSize } from '../../lib/crop';
+import { drawCaption, loadCaptionFont, type Caption } from '../../lib/caption';
 
 export type FramePreview = { state: 'loading' } | { state: 'ready'; url: string } | { state: 'error' };
 
@@ -12,6 +13,8 @@ interface TrimTimelineProps {
 	frames: { start: FramePreview; end: FramePreview };
 	frameSize: FrameSize | null;
 	crop: Crop | null;
+	// The text to preview and the GIF's pixel size; null when there is no text.
+	caption: { caption: Caption; size: FrameSize } | null;
 	disabled: boolean;
 	onRangeChange: (range: ClipRange) => void;
 	onCropChange: (crop: Crop) => void;
@@ -71,6 +74,41 @@ function CropOverlay({ crop, disabled, onChange }: { crop: Crop; disabled: boole
 				}}
 			/>
 		</div>
+	);
+}
+
+// The same drawing as the GIF, at the GIF's own pixel size, scaled onto the kept area of the picture.
+function CaptionPreview({ caption, size, crop }: { caption: Caption; size: FrameSize; crop: Crop | null }) {
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+
+	useEffect(() => {
+		let cancelled = false;
+		const draw = () => {
+			const ctx = canvasRef.current?.getContext('2d');
+			if (ctx && !cancelled) drawCaption(ctx, caption, size);
+		};
+		draw();
+		// Redraw once the font arrives; until then the fallback font stands in.
+		loadCaptionFont(caption.font).then(draw, () => {});
+		return () => {
+			cancelled = true;
+		};
+	}, [caption, size.width, size.height]);
+
+	return (
+		<canvas
+			ref={canvasRef}
+			aria-hidden="true"
+			width={size.width}
+			height={size.height}
+			className="pointer-events-none absolute"
+			style={{
+				left: `${(crop?.x ?? 0) * 100}%`,
+				top: `${(crop?.y ?? 0) * 100}%`,
+				width: `${(crop?.w ?? 1) * 100}%`,
+				height: `${(crop?.h ?? 1) * 100}%`,
+			}}
+		/>
 	);
 }
 
@@ -135,6 +173,7 @@ export default function TrimTimeline({
 	frames,
 	frameSize,
 	crop,
+	caption,
 	disabled,
 	onRangeChange,
 	onCropChange,
@@ -210,7 +249,13 @@ export default function TrimTimeline({
 	const showVideo = mode === 'checking' || mode === 'playable';
 	const ready = range !== null && durationSec !== null;
 	const percent = (sec: number) => (durationSec ? (sec / durationSec) * 100 : 0);
-	const overlay = crop ? <CropOverlay crop={crop} disabled={disabled} onChange={onCropChange} /> : null;
+	const overlay =
+		crop || caption ? (
+			<>
+				{caption ? <CaptionPreview caption={caption.caption} size={caption.size} crop={crop} /> : null}
+				{crop ? <CropOverlay crop={crop} disabled={disabled} onChange={onCropChange} /> : null}
+			</>
+		) : null;
 
 	return (
 		<div className="flex flex-col gap-4">

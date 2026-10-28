@@ -212,19 +212,27 @@ export async function convertToGif(
 	settings: OutputSettings,
 	crop: Crop | null,
 	playback: Playback,
+	// A transparent PNG at the GIF's output size, laid over every frame; null for no text.
+	textImage: Blob | null,
 	onProgress?: (fraction: number) => void,
 ): Promise<Blob> {
 	await prepareInput(video);
 	const { engine, name } = await currentInput();
 	const output = 'output.gif';
+	const text = 'text.png';
 	const { fps, width, quality } = settings;
 	// Crop first so Max width applies to the kept area.
-	const filter =
+	const frames =
 		(crop ? `${cropFilter(crop)},` : '') +
 		speedFilter(playback) +
-		`fps=${fps},scale='min(${width},iw)':-1:flags=lanczos,` +
+		`fps=${fps},scale='min(${width},iw)':-1:flags=lanczos`;
+	const finish =
 		directionFilter(playback) +
 		`split[a][b];[a]palettegen=max_colors=${QUALITY_COLORS[quality]}[p];[b][p]paletteuse`;
+	// overlay repeats the single PNG frame for the whole clip.
+	const filterArgs = textImage
+		? ['-i', text, '-filter_complex', `[0:v]${frames}[base];[base][1:v]overlay=0:0,${finish}`]
+		: ['-vf', `${frames},${finish}`];
 
 	const clipSec = range.endSec - range.startSec;
 	// Speed and boomerang make the GIF longer or shorter than the clip.
@@ -237,11 +245,12 @@ export async function convertToGif(
 	engine.on('progress', report);
 
 	try {
+		if (textImage) await guard(engine, engine.writeFile(text, new Uint8Array(await textImage.arrayBuffer())));
 		const exitCode = await guard(engine, engine.exec([
 			'-ss', range.startSec.toFixed(1),
 			'-t', clipSec.toFixed(1),
 			'-i', name,
-			'-vf', filter,
+			...filterArgs,
 			'-loop', '0',
 			output,
 		]));
@@ -256,6 +265,7 @@ export async function convertToGif(
 	} finally {
 		engine.off('log', collect);
 		engine.off('progress', report);
+		if (textImage) await engine.deleteFile(text).catch(() => {});
 	}
 	const data = await readAndDelete(engine, output);
 	if (!data) throw new ConversionError('ffmpeg produced no GIF');

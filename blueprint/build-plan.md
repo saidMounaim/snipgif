@@ -24,7 +24,7 @@ Start with your first real slice of functionality.
 - [x] 6. **Progress and error handling** - Progress bar during conversion and friendly messages for unsupported files or low-memory devices.
 - [x] 7. **Crop and resize** - Crop the frame with an aspect-ratio picker (1:1, 16:9, 9:16) for social media formats.
 - [x] 8. **Speed, reverse, and boomerang** - Change playback speed, reverse the clip, or create a back-and-forth loop.
-- [ ] 9. **Text and caption overlay** - Add meme-style text with font, color, and position options.
+- [x] 9. **Text and caption overlay** - Add meme-style text with font, color, and position options.
 - [ ] 10. **GIF compressor** - Reduce the size of existing GIFs with color reduction and frame skipping, as a standalone tool.
 - [ ] 11. **Modern responsive UI** - Mobile-first layout with dark and light mode, a clean one-page workflow, and accessible controls.
 - [ ] 12. **Technical SEO foundation** - Meta tags, Open Graph and Twitter cards, sitemap.xml, robots.txt, canonical URLs, and JSON-LD structured data.

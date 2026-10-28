@@ -4,6 +4,7 @@ import DropZone from './DropZone';
 import GifResult, { type ResultFeedback } from './GifResult';
 import OutputSettingsPanel from './OutputSettingsPanel';
 import PlaybackPanel, { PLAYBACK_LIMIT_ID } from './PlaybackPanel';
+import TextPanel from './TextPanel';
 import TrimTimeline, { type FramePreview } from './TrimTimeline';
 import {
 	formatFileSize,
@@ -16,6 +17,14 @@ import { defaultRange, lastFrameSec, type ClipRange } from '../../lib/clip-range
 import type { Crop, FrameSize } from '../../lib/crop';
 import { DEFAULT_PRESET, presetSettings, type OutputSettings } from '../../lib/output-settings';
 import { DEFAULT_PLAYBACK, tooLong, type Playback } from '../../lib/playback';
+import {
+	CaptionFontError,
+	DEFAULT_CAPTION,
+	hasText,
+	outputSize,
+	renderCaptionPng,
+	type Caption,
+} from '../../lib/caption';
 import {
 	convertToGif,
 	EngineLoadError,
@@ -30,7 +39,7 @@ import {
 } from '../../lib/gif-engine';
 
 type ConversionState = 'idle' | 'loading-core' | 'converting' | 'done' | 'error';
-type ConversionError = 'load' | 'memory' | 'unsupported' | 'convert';
+type ConversionError = 'load' | 'memory' | 'unsupported' | 'font' | 'convert';
 type MediaState =
 	| { kind: 'checking' }
 	| { kind: 'probing' }
@@ -55,6 +64,7 @@ const CONVERSION_ERROR_MESSAGES: Record<ConversionError, string> = {
 	memory:
 		'Your device ran out of memory making this GIF. Try a shorter clip, a smaller width, or the Small for chat preset.',
 	unsupported: "We can't convert this video's contents, even though the file type is supported. Try another video.",
+	font: "The text font couldn't load. Check your connection and try again.",
 	convert: 'Something went wrong converting this video. Please try another video.',
 };
 
@@ -89,6 +99,7 @@ export default function Converter() {
 	const [frameSize, setFrameSize] = useState<FrameSize | null>(null);
 	const [crop, setCrop] = useState<Crop | null>(null);
 	const [playback, setPlayback] = useState<Playback>(DEFAULT_PLAYBACK);
+	const [caption, setCaption] = useState<Caption>(DEFAULT_CAPTION);
 	const dropZoneRef = useRef<HTMLButtonElement>(null);
 	const selectedRef = useRef<HTMLHeadingElement>(null);
 	const returnFocusRef = useRef<'dropzone' | 'selected' | null>(null);
@@ -102,6 +113,9 @@ export default function Converter() {
 	const busy = conversion === 'loading-core' || conversion === 'converting';
 	const durationSec = media.kind === 'playable' || media.kind === 'frames' ? media.durationSec : null;
 	const gifTooLong = range !== null && tooLong(range, playback);
+	// The GIF's pixel size, once the frame shape is known; text is drawn at exactly this size.
+	const gifSize = frameSize ? outputSize(frameSize, crop, settings) : null;
+	const frameUnavailable = !frameSize && media.kind === 'frames' && frames.start.state === 'error';
 
 	// Without this, a file dropped outside the zone makes the browser navigate to it.
 	useEffect(() => {
@@ -198,6 +212,7 @@ export default function Converter() {
 		setFrameSize(null);
 		setCrop(null);
 		setPlayback(DEFAULT_PLAYBACK);
+		setCaption(DEFAULT_CAPTION);
 		replaceGif(null);
 		setConversion('idle');
 		setConversionError(null);
@@ -256,9 +271,10 @@ export default function Converter() {
 		setProgress(0);
 		try {
 			setConversion('loading-core');
+			const textImage = gifSize && hasText(caption) ? await renderCaptionPng(caption, gifSize) : null;
 			await loadGifEngine();
 			setConversion('converting');
-			const blob = await convertToGif(video, range, settings, crop, playback, (fraction) =>
+			const blob = await convertToGif(video, range, settings, crop, playback, textImage, (fraction) =>
 				setProgress((current) => Math.max(current, fraction)),
 			);
 			replaceGif({ blob, objectUrl: URL.createObjectURL(blob), sizeBytes: blob.size });
@@ -272,7 +288,9 @@ export default function Converter() {
 						? 'memory'
 						: caught instanceof UnsupportedVideoError
 							? 'unsupported'
-							: 'convert',
+							: caught instanceof CaptionFontError
+								? 'font'
+								: 'convert',
 			);
 		}
 	}
@@ -318,6 +336,7 @@ export default function Converter() {
 							frames={frames}
 							frameSize={frameSize}
 							crop={crop}
+							caption={gifSize && hasText(caption) ? { caption, size: gifSize } : null}
 							disabled={busy}
 							onRangeChange={setRange}
 							onCropChange={setCrop}
@@ -330,13 +349,21 @@ export default function Converter() {
 						<CropPanel
 							crop={crop}
 							frameSize={frameSize}
-							unavailable={!frameSize && media.kind === 'frames' && frames.start.state === 'error'}
+							unavailable={frameUnavailable}
 							disabled={busy}
 							onChange={setCrop}
 						/>
 					) : null}
 					{range ? (
 						<PlaybackPanel playback={playback} range={range} disabled={busy} onChange={setPlayback} />
+					) : null}
+					{range ? (
+						<TextPanel
+							caption={caption}
+							unavailable={frameUnavailable}
+							disabled={busy || !frameSize}
+							onChange={setCaption}
+						/>
 					) : null}
 					{range ? <OutputSettingsPanel settings={settings} disabled={busy} onChange={setSettings} /> : null}
 					<div className="flex flex-wrap gap-3">
