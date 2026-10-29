@@ -15,11 +15,11 @@ const CHOICES: { value: ThemePreference; label: string; Icon: LucideIcon }[] = [
 	{ value: 'dark', label: 'Dark', Icon: Moon },
 ];
 
-// Same visually hidden radio and 44 px label pattern as the tool settings.
+// Same visually hidden radio pattern as the tool settings, styled as a segmented control.
 const CHOICE =
-	'flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-1.5 rounded-lg px-2 text-sm font-medium text-fg-muted hover:bg-surface-muted hover:text-fg ' +
-	'has-checked:bg-accent-soft has-checked:text-accent-fg ' +
-	'has-focus-visible:outline-4 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent-line';
+	'flex min-h-9 min-w-9 cursor-pointer items-center justify-center gap-1.5 rounded-full px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground ' +
+	'has-checked:bg-card has-checked:text-foreground has-checked:shadow-sm ' +
+	'has-focus-visible:ring-3 has-focus-visible:ring-ring/50';
 
 export default function ThemeToggle() {
 	// The server can't know the stored choice, so it renders System and the effect syncs.
@@ -45,7 +45,7 @@ export default function ThemeToggle() {
 	}
 
 	return (
-		<fieldset className="flex items-center gap-1">
+		<fieldset className="flex items-center gap-0.5 rounded-full border border-border bg-muted/60 p-1">
 			<legend className="sr-only">Theme</legend>
 			{CHOICES.map(({ value, label, Icon }) => (
 				<label key={value} className={CHOICE}>
@@ -58,7 +58,7 @@ export default function ThemeToggle() {
 						className="sr-only"
 					/>
 					<Icon aria-hidden="true" className="h-4 w-4" />
-					<span className="sr-only sm:not-sr-only">{label}</span>
+					<span className="sr-only">{label}</span>
 				</label>
 			))}
 		</fieldset>

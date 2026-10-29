@@ -2,8 +2,7 @@
 
 > Tuned by `/onboard` for the detected stack: Astro 7 (static output) + React 19
 > islands + TypeScript (strict) + Tailwind CSS v4, npm, with ffmpeg.wasm and
-> Lucide icons (`lucide-react`). shadcn/ui is not used; the app keeps its own
-> small Tailwind components.
+> Lucide icons (`lucide-react`) and shadcn/ui (radix base, Nova preset).
 
 ## TypeScript
 
@@ -66,12 +65,23 @@
   `tailwind.config.js`; compiled by the `@tailwindcss/vite` plugin in
   `astro.config.mjs`
 - No inline styles
-- Colors come only from the semantic tokens in `global.css` (`bg-page`,
-  `bg-surface`, `text-fg`, `text-fg-muted`, `border-line`, `bg-accent`,
-  `outline-accent-line`, and so on); each has a light and a dark value, so
-  components need no `dark:` color variants. Fixed colors are only for content
-  that looks the same in both themes (video letterbox, crop overlay, caption
-  swatches, white text on the accent)
+- Colors come only from the shadcn tokens in `global.css` (`bg-background`,
+  `bg-card`, `text-foreground`, `text-muted-foreground`, `border-border`,
+  `border-input`, `bg-primary`, `ring-ring`, `text-destructive`, plus the
+  project's `text-warning`, `text-success`, and the `brand-from`, `brand-via`,
+  and `brand-to` gradient stops with the `bg-brand` and `text-brand`
+  utilities); each has a light and a dark value, so components need no `dark:`
+  color variants. Fixed colors are only for content that looks the same in both
+  themes (video letterbox, crop overlay, caption swatches, white text on the
+  brand gradient)
+- `src/components/ui/` holds shadcn/ui components added with
+  `npx shadcn@latest add <name>`. They are project-owned and may be edited (for
+  example the 44 px `lg` button size and the `brand` variant). Add a component
+  only when a screen uses it. `src/components/ui/form-styles.ts` holds the
+  shared classes for native radio and checkbox choices, sliders, and settings
+  panels; keep those native inputs rather than swapping in Radix widgets
+- Tool controls and buttons keep touch targets of at least 44 px (`size="lg"`
+  on `Button`, `min-h-11` elsewhere)
 - Dark mode is `<html data-theme="dark">`, set before first paint by the inline
   script in `Layout.astro`; use the `dark:` variant only for non-color
   differences such as `dark:shadow-none`

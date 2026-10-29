@@ -1,4 +1,6 @@
 import { useRef, useState, type DragEvent, type RefObject } from 'react';
+import { Upload } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface DropZoneProps {
 	title: string;
@@ -41,14 +43,23 @@ export default function DropZone({ title, hint, accept, onFiles, describedBy, bu
 				onDragLeave={handleDragLeave}
 				onDrop={handleDrop}
 				aria-describedby={describedBy}
-				className={`flex w-full flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-6 py-16 text-center transition-colors focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent-line ${
+				className={cn(
+					'group flex w-full flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed bg-card/80 px-6 py-16 text-center shadow-xl shadow-primary/5 backdrop-blur transition-all outline-none focus-visible:ring-4 focus-visible:ring-ring/50 sm:py-20',
 					dragging
-						? 'border-accent-line bg-accent-soft'
-						: 'border-line-strong bg-surface hover:border-accent-line'
-				}`}
+						? 'scale-[1.01] border-primary bg-accent'
+						: 'border-input hover:border-primary hover:bg-accent/40',
+				)}
 			>
-				<span className="text-lg font-semibold text-fg">{title}</span>
-				<span className="text-sm text-fg-muted">{hint}</span>
+				<span
+					aria-hidden="true"
+					className="flex size-16 items-center justify-center rounded-2xl bg-brand text-white shadow-lg shadow-primary/30 transition-transform group-hover:-translate-y-1"
+				>
+					<Upload className="size-7" />
+				</span>
+				<span className="flex flex-col gap-1">
+					<span className="text-lg font-semibold text-foreground">{title}</span>
+					<span className="text-sm text-muted-foreground">{hint}</span>
+				</span>
 			</button>
 			<input
 				ref={inputRef}

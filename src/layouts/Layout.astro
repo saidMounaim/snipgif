@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { Film } from 'lucide-react';
 import ThemeToggle from '../components/site/ThemeToggle';
 
 interface Props {
@@ -15,7 +16,7 @@ const NAV = [
 	{ id: 'compressor', href: '/gif-compressor', label: 'GIF Compressor' },
 ] as const;
 
-const FOCUS = 'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line';
+const FOCUS = 'outline-none focus-visible:ring-3 focus-visible:ring-ring/50';
 ---
 
 <html lang="en">
@@ -43,20 +44,32 @@ const FOCUS = 'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visi
 			})();
 		</script>
 	</head>
-	<body class="min-h-screen bg-page font-sans text-fg antialiased">
-		<header class="border-b border-line bg-surface">
-			<div class="mx-auto flex w-full max-w-2xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2">
-				<a href="/" class={`rounded-lg text-lg font-bold tracking-tight text-fg ${FOCUS}`}>Snipgif</a>
+	<body class="relative isolate min-h-screen overflow-x-hidden antialiased">
+		<!-- Soft brand glow behind the page; purely decorative. -->
+		<div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-144 overflow-hidden">
+			<div class="absolute -top-40 left-1/2 h-120 w-120 translate-x-[-85%] rounded-full bg-brand-from/25 blur-3xl"></div>
+			<div class="absolute -top-24 left-1/2 h-104 w-104 translate-x-[-5%] rounded-full bg-brand-via/20 blur-3xl"></div>
+			<div class="absolute top-40 left-1/2 size-72 translate-x-[40%] rounded-full bg-brand-to/15 blur-3xl"></div>
+		</div>
+
+		<header class="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-xl">
+			<div class="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
+				<a href="/" class={`flex items-center gap-2 rounded-lg text-lg font-bold tracking-tight ${FOCUS}`}>
+					<span class="flex size-8 items-center justify-center rounded-lg bg-brand text-white shadow-md shadow-primary/30">
+						<Film aria-hidden="true" className="size-4" />
+					</span>
+					Snipgif
+				</a>
 				<!-- Small screens: name and theme on the first row, navigation on the second. -->
-				<nav aria-label="Main" class="order-last w-full sm:order-none sm:w-auto">
-					<ul class="flex flex-wrap gap-1">
+				<nav aria-label="Main" class="order-last w-full sm:order-0 sm:w-auto">
+					<ul class="flex gap-1 rounded-full border border-border bg-muted/60 p-1">
 						{
 							NAV.map(({ id, href, label }) => (
-								<li>
+								<li class="flex-1 sm:flex-none">
 									<a
 										href={href}
 										aria-current={id === current ? 'page' : undefined}
-										class={`inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium text-fg-muted hover:bg-surface-muted hover:text-fg aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-fg ${FOCUS}`}
+										class={`inline-flex min-h-10 w-full items-center justify-center rounded-full px-4 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:bg-card aria-[current=page]:text-foreground aria-[current=page]:shadow-sm ${FOCUS}`}
 									>
 										{label}
 									</a>
@@ -69,5 +82,8 @@ const FOCUS = 'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visi
 			</div>
 		</header>
 		<slot />
+		<footer class="mx-auto w-full max-w-3xl px-4 pb-10 text-center text-sm text-muted-foreground">
+			Made in your browser. Nothing is uploaded.
+		</footer>
 	</body>
 </html>

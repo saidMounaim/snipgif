@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState, type PointerEvent, type ReactNode, type SyntheticEvent } from 'react';
+import { Pause, Play } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { CLIP_LIMITS, formatTime, lastFrameSec, moveEnd, moveStart, type ClipRange } from '../../lib/clip-range';
 import { cropAxis, cropPosition, moveCrop, type Crop, type FrameSize } from '../../lib/crop';
 import { drawCaption, loadCaptionFont, type Caption } from '../../lib/caption';
@@ -24,11 +26,11 @@ interface TrimTimelineProps {
 }
 
 const THUMB =
-	'[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-7 [&::-webkit-slider-thumb]:w-7 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:shadow ' +
-	'[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:bg-accent [&::-moz-range-thumb]:shadow';
+	'[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-7 [&::-webkit-slider-thumb]:w-7 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:shadow-primary/40 ' +
+	'[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:shadow-md';
 
 // Two native range inputs share one track so keyboard and screen-reader support come for free.
-const SLIDER = `pointer-events-none absolute inset-0 h-11 w-full appearance-none bg-transparent focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line disabled:opacity-60 ${THUMB}`;
+const SLIDER = `pointer-events-none absolute inset-0 h-11 w-full appearance-none bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50 ${THUMB}`;
 
 // Dims everything outside the kept area; the box can be dragged along the crop's free axis.
 function CropOverlay({ crop, disabled, onChange }: { crop: Crop; disabled: boolean; onChange: (crop: Crop) => void }) {
@@ -129,7 +131,7 @@ function Frame({
 }) {
 	return (
 		<figure className="flex flex-1 flex-col gap-1">
-			<div className="flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-surface-muted text-sm text-fg-muted">
+			<div className="flex aspect-video items-center justify-center overflow-hidden rounded-xl bg-muted text-sm text-muted-foreground">
 				{preview.state === 'ready' ? (
 					// Sized to the picture's own shape inside the 16:9 box, so an overlay lines up with it.
 					<div
@@ -160,7 +162,7 @@ function Frame({
 					'Preview not available'
 				)}
 			</div>
-			<figcaption className="text-xs font-medium text-fg-muted">{label}</figcaption>
+			<figcaption className="text-xs font-medium text-muted-foreground">{label}</figcaption>
 		</figure>
 	);
 }
@@ -260,7 +262,7 @@ export default function TrimTimeline({
 	return (
 		<div className="flex flex-col gap-4">
 			{showVideo ? (
-				<div className={`flex justify-center overflow-hidden rounded-lg bg-black ${mode === 'checking' ? 'hidden' : ''}`}>
+				<div className={`flex justify-center overflow-hidden rounded-2xl bg-black shadow-lg ring-1 ring-foreground/10 ${mode === 'checking' ? 'hidden' : ''}`}>
 					{/* Once the shape is known, the box matches the picture (max 18rem tall) so the overlay lines up. */}
 					<div
 						className={frameSize ? 'relative' : 'relative w-full'}
@@ -310,9 +312,9 @@ export default function TrimTimeline({
 				<>
 					<div className="relative h-11">
 						{/* Inset by half a thumb so the highlight lines up with where native thumbs can travel. */}
-						<div className="absolute inset-x-3.5 top-1/2 h-2 -translate-y-1/2 rounded-full bg-line">
+						<div className="absolute inset-x-3.5 top-1/2 h-2 -translate-y-1/2 rounded-full bg-muted ring-1 ring-border ring-inset">
 							<div
-								className="absolute inset-y-0 rounded-full bg-accent"
+								className="absolute inset-y-0 rounded-full bg-linear-to-r from-brand-from to-brand-via"
 								style={{ left: `${percent(range.startSec)}%`, width: `${percent(range.endSec - range.startSec)}%` }}
 							/>
 						</div>
@@ -351,19 +353,15 @@ export default function TrimTimeline({
 					</div>
 
 					<div className="flex flex-wrap items-center justify-between gap-3">
-						<p className="text-sm text-fg-muted">
+						<p className="text-sm text-muted-foreground tabular-nums">
 							Selected {formatTime(range.startSec)} to {formatTime(range.endSec)} (
 							{(range.endSec - range.startSec).toFixed(1)} s)
 						</p>
 						{mode === 'playable' ? (
-							<button
-								type="button"
-								onClick={togglePlay}
-								disabled={disabled}
-								className="rounded-lg border border-line-strong px-4 py-2 text-sm font-medium text-fg hover:bg-surface-muted focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line disabled:cursor-not-allowed disabled:opacity-60"
-							>
+							<Button type="button" variant="outline" size="lg" onClick={togglePlay} disabled={disabled}>
+								{playing ? <Pause aria-hidden="true" /> : <Play aria-hidden="true" />}
 								{playing ? 'Pause' : 'Play selection'}
-							</button>
+							</Button>
 						) : null}
 					</div>
 				</>

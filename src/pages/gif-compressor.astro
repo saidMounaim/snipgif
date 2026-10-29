@@ -1,18 +1,16 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Hero from '../components/site/Hero.astro';
 import Compressor from '../components/compressor/Compressor';
 ---
 
 <Layout title="GIF Compressor - Snipgif" current="compressor">
-	<main class="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-16">
-		<div class="flex flex-col items-center gap-4 text-center">
-			<h1 class="text-3xl font-bold tracking-tight text-fg sm:text-4xl">
-				Make your GIFs smaller, free, fast, and private
-			</h1>
-			<p class="rounded-full bg-accent-soft px-4 py-1 text-sm font-medium text-accent-fg">
-				Your files never leave your device
-			</p>
-		</div>
+	<main class="mx-auto flex w-full max-w-3xl flex-col gap-10 px-4 pt-14 pb-16 sm:pt-20">
+		<Hero
+			lead="Make your GIFs smaller,"
+			highlight="free, fast, and private"
+			description="Cut colors, skip frames, or shrink the width. Everything runs right in your browser."
+		/>
 		<Compressor client:load />
 	</main>
 </Layout>

@@ -1,4 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
+import { Image, Minimize2, RefreshCw, SlidersHorizontal } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { CHOICE, FIELD_LABEL, PANEL, PANEL_HEADING, PANEL_ICON, SLIDER } from '@/components/ui/form-styles';
 import DropZone from '../converter/DropZone';
 import GifResult, { type ResultFeedback } from '../converter/GifResult';
 import {
@@ -59,16 +65,6 @@ const STATUS_MESSAGES: Partial<Record<CompressionState, string>> = {
 const ERROR_ID = 'gif-upload-error';
 const STATUS_ID = 'compression-status';
 
-const FOCUS = 'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line';
-// Same visually hidden radio and 44 px label as the converter's Output settings.
-const CHOICE =
-	'flex min-h-11 cursor-pointer items-center rounded-lg border border-line-strong px-4 text-sm font-medium text-fg hover:bg-surface-muted ' +
-	'has-checked:border-accent-line has-checked:bg-accent-soft has-checked:text-accent-fg ' +
-	'has-focus-visible:outline-4 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent-line ' +
-	'has-disabled:cursor-not-allowed has-disabled:opacity-60';
-const SLIDER = `h-11 w-full cursor-pointer accent-accent disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS}`;
-const PRIMARY = `rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS}`;
-const SECONDARY = `rounded-lg border border-line-strong px-4 py-2 text-sm font-medium text-fg hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS}`;
 
 function sizeChange(before: number, after: number): string {
 	const percent = Math.round((Math.abs(before - after) / before) * 100);
@@ -216,19 +212,28 @@ export default function Compressor() {
 	return (
 		<div className="flex flex-col gap-4">
 			{gif && originalUrl ? (
-				<div className="flex flex-col gap-4 rounded-2xl border border-line bg-surface p-6 shadow-sm dark:shadow-none">
-					<div className="flex flex-col gap-1">
-						<h2
-							ref={selectedRef}
-							tabIndex={-1}
-							className="break-all text-lg font-semibold text-fg focus:outline-none"
-						>
-							{gif.name}
-						</h2>
-						<p className="text-sm text-fg-muted">
-							{formatFileSize(gif.sizeBytes)}
-							{source.state === 'ready' ? ` · ${source.width} × ${source.height}` : null}
-						</p>
+				<Card className="gap-6 rounded-3xl p-6 shadow-xl shadow-primary/5 sm:p-8">
+					<div className="flex items-start gap-3">
+						<span aria-hidden="true" className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand text-white shadow-md shadow-primary/25">
+							<Image className="size-5" />
+						</span>
+						<div className="flex min-w-0 flex-col gap-1.5">
+							<h2
+								ref={selectedRef}
+								tabIndex={-1}
+								className="break-all text-lg font-semibold text-foreground focus:outline-none"
+							>
+								{gif.name}
+							</h2>
+							<div className="flex flex-wrap gap-1.5">
+								<Badge variant="secondary">{formatFileSize(gif.sizeBytes)}</Badge>
+								{source.state === 'ready' ? (
+									<Badge variant="outline">
+										{source.width} × {source.height}
+									</Badge>
+								) : null}
+							</div>
+						</div>
 					</div>
 					{source.state !== 'unreadable' ? (
 						<img
@@ -236,16 +241,21 @@ export default function Compressor() {
 							alt={`Original GIF: ${gif.name}`}
 							onLoad={(event) => handleLoad(event.currentTarget.naturalWidth, event.currentTarget.naturalHeight)}
 							onError={() => setSource({ state: 'unreadable' })}
-							className="h-auto max-h-72 max-w-full self-center rounded-xl border border-line"
+							className="h-auto max-h-72 max-w-full self-center rounded-2xl shadow-lg ring-1 ring-foreground/10"
 						/>
 					) : null}
 
 					{settings && source.state === 'ready' ? (
-						<div className="flex flex-col gap-4 border-t border-line pt-4">
-							<h3 className="text-base font-semibold text-fg">Compression settings</h3>
+						<div className={PANEL}>
+							<h3 className={PANEL_HEADING}>
+								<span aria-hidden="true" className={PANEL_ICON}>
+									<SlidersHorizontal />
+								</span>
+								Compression settings
+							</h3>
 
 							<fieldset disabled={busy} className="flex flex-col gap-2">
-								<legend className="mb-2 text-sm font-medium text-fg">Colors</legend>
+								<legend className={`mb-2 ${FIELD_LABEL}`}>Colors</legend>
 								<div className="flex flex-wrap gap-2">
 									{COLOR_CHOICES.map((colors) => (
 										<label key={colors} className={CHOICE}>
@@ -264,7 +274,7 @@ export default function Compressor() {
 							</fieldset>
 
 							<fieldset disabled={busy} className="flex flex-col gap-2">
-								<legend className="mb-2 text-sm font-medium text-fg">Frames</legend>
+								<legend className={`mb-2 ${FIELD_LABEL}`}>Frames</legend>
 								<div className="flex flex-wrap gap-2">
 									{(Object.keys(FRAME_STEPS).map(Number) as FrameStep[]).map((frameStep) => (
 										<label key={frameStep} className={CHOICE}>
@@ -284,10 +294,10 @@ export default function Compressor() {
 
 							<div className="flex flex-col gap-1">
 								<div className="flex items-center justify-between text-sm">
-									<label htmlFor="gif-width" className="font-medium text-fg">
+									<label htmlFor="gif-width" className="font-medium text-foreground">
 										Max width
 									</label>
-									<span className="text-fg-muted">
+									<span className="tabular-nums text-muted-foreground">
 										{settings.width === source.width ? `Original (${source.width} px)` : `${settings.width} px`}
 									</span>
 								</div>
@@ -307,17 +317,19 @@ export default function Compressor() {
 						</div>
 					) : null}
 
-					<div className="flex flex-wrap gap-3">
+					<div className="flex flex-wrap gap-3 border-t border-border pt-6">
 						{source.state !== 'unreadable' ? (
-							<button type="button" onClick={compress} disabled={busy || !settings} className={PRIMARY}>
+							<Button type="button" variant="brand" size="lg" onClick={compress} disabled={busy || !settings}>
+								<Minimize2 aria-hidden="true" />
 								Compress GIF
-							</button>
+							</Button>
 						) : null}
-						<button type="button" onClick={chooseAnother} disabled={busy} className={SECONDARY}>
+						<Button type="button" variant="outline" size="lg" onClick={chooseAnother} disabled={busy}>
+							<RefreshCw aria-hidden="true" />
 							Choose another GIF
-						</button>
+						</Button>
 					</div>
-				</div>
+				</Card>
 			) : (
 				<DropZone
 					title="Drop a GIF here or click to choose"
@@ -329,19 +341,23 @@ export default function Compressor() {
 				/>
 			)}
 
-			<p id={ERROR_ID} role="alert" className="text-sm font-medium text-danger-fg empty:hidden">
+			<p
+				id={ERROR_ID}
+				role="alert"
+				className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive empty:hidden"
+			>
 				{errorText}
 			</p>
 			<div aria-live="polite" className="flex flex-col gap-1 text-sm font-medium empty:hidden">
-				{gif && warning ? <p className="text-warning-fg">{WARNING_MESSAGES[warning]}</p> : null}
+				{gif && warning ? <p className="text-warning">{WARNING_MESSAGES[warning]}</p> : null}
 				{gif && statusText ? (
-					<p id={STATUS_ID} className="text-fg-muted">
+					<p id={STATUS_ID} className="text-muted-foreground">
 						{statusText}
 					</p>
 				) : null}
-				{gif && feedback?.tone === 'status' ? <p className="text-fg-muted">{feedback.text}</p> : null}
+				{gif && feedback?.tone === 'status' ? <p className="text-muted-foreground">{feedback.text}</p> : null}
 			</div>
-			{busy ? <progress aria-labelledby={STATUS_ID} className="h-2 w-full accent-accent" /> : null}
+			{busy ? <Progress aria-labelledby={STATUS_ID} value={null} /> : null}
 
 			{gif && result ? (
 				<GifResult
@@ -350,8 +366,12 @@ export default function Compressor() {
 					alt={`Compressed GIF: ${gif.name}`}
 					onFeedback={setFeedback}
 				>
-					<p className="text-sm font-medium text-fg">{sizeChange(gif.sizeBytes, result.sizeBytes)}</p>
-					{result.sizeBytes >= gif.sizeBytes ? <p className="text-sm text-warning-fg">{LARGER_NOTE}</p> : null}
+					<p
+						className={`text-sm font-semibold ${result.sizeBytes < gif.sizeBytes ? 'text-success' : 'text-foreground'}`}
+					>
+						{sizeChange(gif.sizeBytes, result.sizeBytes)}
+					</p>
+					{result.sizeBytes >= gif.sizeBytes ? <p className="text-sm text-warning">{LARGER_NOTE}</p> : null}
 				</GifResult>
 			) : null}
 		</div>

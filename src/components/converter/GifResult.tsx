@@ -1,4 +1,6 @@
 import { useMemo, type ReactNode } from 'react';
+import { CheckCircle2, Copy, Download, Share2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { formatFileSize } from '../../lib/video-file';
 import type { GifResult as GifResultData } from '../../lib/gif-engine';
 
@@ -16,8 +18,6 @@ type Props = {
 const SHARE_ERROR = "We couldn't share this GIF. Use Download instead.";
 const COPY_ERROR = "We couldn't copy this GIF. Use Download instead.";
 const COPY_DONE = 'GIF copied to the clipboard.';
-
-const BUTTON_FOCUS = 'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line';
 
 export default function GifResult({ result, fileName, alt, onFeedback, children }: Props) {
 	const file = useMemo(
@@ -53,46 +53,44 @@ export default function GifResult({ result, fileName, alt, onFeedback, children 
 	}
 
 	return (
-		<section aria-labelledby="gif-result-heading" className="flex flex-col gap-4 rounded-2xl border border-line bg-surface p-6 shadow-sm dark:shadow-none">
-			<div className="flex flex-col gap-1">
-				<h2 id="gif-result-heading" className="text-lg font-semibold text-fg">
-					Your GIF
-				</h2>
-				<p className="text-sm text-fg-muted">{formatFileSize(result.sizeBytes)}</p>
-				{children}
+		<section
+			aria-labelledby="gif-result-heading"
+			className="flex animate-in flex-col gap-5 rounded-3xl border border-border bg-card p-6 shadow-xl shadow-primary/5 fade-in slide-in-from-bottom-4 duration-500 sm:p-8"
+		>
+			<div className="flex items-start gap-3">
+				<span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-success/15 text-success">
+					<CheckCircle2 className="size-5" />
+				</span>
+				<div className="flex flex-col gap-1">
+					<h2 id="gif-result-heading" className="text-lg font-semibold text-foreground">
+						Your GIF
+					</h2>
+					<p className="text-sm text-muted-foreground">{formatFileSize(result.sizeBytes)}</p>
+					{children}
+				</div>
 			</div>
-			<img
-				src={result.objectUrl}
-				alt={alt}
-				className="h-auto max-w-full self-center rounded-xl border border-line"
-			/>
+			<div className="flex justify-center rounded-2xl bg-muted/60 p-3 ring-1 ring-border ring-inset">
+				<img src={result.objectUrl} alt={alt} className="h-auto max-w-full rounded-xl shadow-md" />
+			</div>
 			{/* Stays in view at the bottom of small screens while the result is on screen. */}
 			<div className="sticky bottom-4 flex flex-wrap gap-3 sm:static">
-				<a
-					href={result.objectUrl}
-					download={fileName}
-					onClick={() => onFeedback(null)}
-					className={`rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-accent-hover sm:shadow-none ${BUTTON_FOCUS}`}
-				>
-					Download GIF
-				</a>
+				<Button asChild variant="brand" size="lg">
+					<a href={result.objectUrl} download={fileName} onClick={() => onFeedback(null)}>
+						<Download aria-hidden="true" />
+						Download GIF
+					</a>
+				</Button>
 				{canCopy ? (
-					<button
-						type="button"
-						onClick={copy}
-						className={`rounded-lg border border-line-strong bg-surface px-4 py-2 text-sm font-medium text-fg hover:bg-surface-muted ${BUTTON_FOCUS}`}
-					>
+					<Button type="button" variant="outline" size="lg" onClick={copy}>
+						<Copy aria-hidden="true" />
 						Copy GIF
-					</button>
+					</Button>
 				) : null}
 				{canShare ? (
-					<button
-						type="button"
-						onClick={share}
-						className={`rounded-lg border border-line-strong bg-surface px-4 py-2 text-sm font-medium text-fg hover:bg-surface-muted ${BUTTON_FOCUS}`}
-					>
+					<Button type="button" variant="outline" size="lg" onClick={share}>
+						<Share2 aria-hidden="true" />
 						Share
-					</button>
+					</Button>
 				) : null}
 			</div>
 		</section>

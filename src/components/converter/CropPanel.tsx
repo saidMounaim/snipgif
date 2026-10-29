@@ -1,3 +1,5 @@
+import { Crop as CropIcon } from 'lucide-react';
+import { CHOICE, HINT, PANEL, PANEL_HEADING, PANEL_ICON, SLIDER } from '@/components/ui/form-styles';
 import {
 	CROP_ASPECTS,
 	centeredCrop,
@@ -18,14 +20,6 @@ interface CropPanelProps {
 	onChange: (crop: Crop | null) => void;
 }
 
-const FOCUS = 'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line';
-// Same visually hidden radio and 44 px label as Output settings.
-const CHOICE =
-	'flex min-h-11 cursor-pointer items-center rounded-lg border border-line-strong px-4 text-sm font-medium text-fg hover:bg-surface-muted ' +
-	'has-checked:border-accent-line has-checked:bg-accent-soft has-checked:text-accent-fg ' +
-	'has-focus-visible:outline-4 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent-line ' +
-	'has-disabled:cursor-not-allowed has-disabled:opacity-60';
-const SLIDER = `h-11 w-full cursor-pointer accent-accent disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS}`;
 const NOTE_ID = 'crop-note';
 
 export default function CropPanel({ crop, frameSize, unavailable, disabled, onChange }: CropPanelProps) {
@@ -42,13 +36,18 @@ export default function CropPanel({ crop, frameSize, unavailable, disabled, onCh
 	}
 
 	return (
-		<div className="flex flex-col gap-4 border-t border-line pt-4">
+		<div className={PANEL}>
 			<fieldset
 				disabled={disabled || unavailable || !frameSize}
 				aria-describedby={note ? NOTE_ID : undefined}
 				className="flex flex-col gap-2"
 			>
-				<legend className="mb-2 text-base font-semibold text-fg">Crop</legend>
+				<legend className={`mb-3 ${PANEL_HEADING}`}>
+					<span aria-hidden="true" className={PANEL_ICON}>
+						<CropIcon />
+					</span>
+					Crop
+				</legend>
 				<div className="flex flex-wrap gap-2">
 					<label className={CHOICE}>
 						<input
@@ -76,7 +75,7 @@ export default function CropPanel({ crop, frameSize, unavailable, disabled, onCh
 					))}
 				</div>
 				{note ? (
-					<p id={NOTE_ID} className="text-xs text-fg-muted">
+					<p id={NOTE_ID} className={HINT}>
 						{note}
 					</p>
 				) : null}
@@ -85,10 +84,10 @@ export default function CropPanel({ crop, frameSize, unavailable, disabled, onCh
 			{crop && axis ? (
 				<div className="flex flex-col gap-1">
 					<div className="flex items-center justify-between text-sm">
-						<label htmlFor="crop-position" className="font-medium text-fg">
+						<label htmlFor="crop-position" className="font-medium text-foreground">
 							Crop position
 						</label>
-						<span className="text-fg-muted">{axis === 'x' ? 'Left to right' : 'Top to bottom'}</span>
+						<span className="text-muted-foreground">{axis === 'x' ? 'Left to right' : 'Top to bottom'}</span>
 					</div>
 					<input
 						id="crop-position"

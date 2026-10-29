@@ -1,4 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
+import { FileVideo, RefreshCw, RotateCcw, Sparkles } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import CropPanel from './CropPanel';
 import DropZone from './DropZone';
 import GifResult, { type ResultFeedback } from './GifResult';
@@ -316,18 +321,24 @@ export default function Converter() {
 	return (
 		<div className="flex flex-col gap-4">
 			{video && previewUrl ? (
-				<div className="flex flex-col gap-4 rounded-2xl border border-line bg-surface p-6 shadow-sm dark:shadow-none">
-					<div className="flex flex-col gap-1">
-						<h2
-							ref={selectedRef}
-							tabIndex={-1}
-							className="break-all text-lg font-semibold text-fg focus:outline-none"
-						>
-							{video.name}
-						</h2>
-						<p className="text-sm text-fg-muted">
-							{formatFileSize(video.sizeBytes)} · {video.format.toUpperCase()}
-						</p>
+				<Card className="gap-6 rounded-3xl p-6 shadow-xl shadow-primary/5 sm:p-8">
+					<div className="flex items-start gap-3">
+						<span aria-hidden="true" className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand text-white shadow-md shadow-primary/25">
+							<FileVideo className="size-5" />
+						</span>
+						<div className="flex min-w-0 flex-col gap-1.5">
+							<h2
+								ref={selectedRef}
+								tabIndex={-1}
+								className="break-all text-lg font-semibold text-foreground focus:outline-none"
+							>
+								{video.name}
+							</h2>
+							<div className="flex flex-wrap gap-1.5">
+								<Badge variant="secondary">{formatFileSize(video.sizeBytes)}</Badge>
+								<Badge variant="outline">{video.format.toUpperCase()}</Badge>
+							</div>
+						</div>
 					</div>
 					{media.kind !== 'unreadable' && media.kind !== 'probing' ? (
 						<TrimTimeline
@@ -368,36 +379,31 @@ export default function Converter() {
 						/>
 					) : null}
 					{range ? <OutputSettingsPanel settings={settings} disabled={busy} onChange={setSettings} /> : null}
-					<div className="flex flex-wrap gap-3">
+					<div className="flex flex-wrap gap-3 border-t border-border pt-6">
 						{media.kind === 'unreadable' && media.reason === 'load' ? (
-							<button
-								type="button"
-								onClick={readWithFfmpeg}
-								className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-hover focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line"
-							>
+							<Button type="button" variant="brand" size="lg" onClick={readWithFfmpeg}>
+								<RotateCcw aria-hidden="true" />
 								Try again
-							</button>
+							</Button>
 						) : (
-							<button
+							<Button
 								type="button"
+								variant="brand"
+								size="lg"
 								onClick={convert}
 								disabled={busy || !range || gifTooLong}
 								aria-describedby={gifTooLong ? PLAYBACK_LIMIT_ID : undefined}
-								className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-hover focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line disabled:cursor-not-allowed disabled:opacity-60"
 							>
+								<Sparkles aria-hidden="true" />
 								Convert to GIF
-							</button>
+							</Button>
 						)}
-						<button
-							type="button"
-							onClick={chooseAnother}
-							disabled={busy}
-							className="rounded-lg border border-line-strong px-4 py-2 text-sm font-medium text-fg hover:bg-surface-muted focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-line disabled:cursor-not-allowed disabled:opacity-60"
-						>
+						<Button type="button" variant="outline" size="lg" onClick={chooseAnother} disabled={busy}>
+							<RefreshCw aria-hidden="true" />
 							Choose another video
-						</button>
+						</Button>
 					</div>
-				</div>
+				</Card>
 			) : (
 				<DropZone
 					title="Drop a video here or click to choose"
@@ -409,28 +415,31 @@ export default function Converter() {
 				/>
 			)}
 
-			<p id={ERROR_ID} role="alert" className="text-sm font-medium text-danger-fg empty:hidden">
+			<p
+				id={ERROR_ID}
+				role="alert"
+				className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive empty:hidden"
+			>
 				{errorText}
 			</p>
 			<div aria-live="polite" className="flex flex-col gap-1 text-sm font-medium empty:hidden">
-				{video && warning ? <p className="text-warning-fg">{WARNING_MESSAGES[warning]}</p> : null}
+				{video && warning ? <p className="text-warning">{WARNING_MESSAGES[warning]}</p> : null}
 				{video && statusText ? (
-					<p id={STATUS_ID} className="text-fg-muted">
+					<p id={STATUS_ID} className="text-muted-foreground">
 						{statusText}
 					</p>
 				) : null}
-				{video && feedback?.tone === 'status' ? <p className="text-fg-muted">{feedback.text}</p> : null}
+				{video && feedback?.tone === 'status' ? <p className="text-muted-foreground">{feedback.text}</p> : null}
 			</div>
 			{busy ? (
 				// Outside the live region so screen readers hear the status once, not every percent.
 				<div className="flex items-center gap-3">
-					<progress
+					<Progress
 						aria-labelledby={STATUS_ID}
-						value={conversion === 'converting' ? progress : undefined}
-						className="h-2 w-full accent-accent"
+						value={conversion === 'converting' ? Math.round(progress * 100) : null}
 					/>
 					{conversion === 'converting' ? (
-						<span className="w-10 text-right text-sm font-medium tabular-nums text-fg-muted">
+						<span className="w-10 text-right text-sm font-medium tabular-nums text-muted-foreground">
 							{Math.round(progress * 100)}%
 						</span>
 					) : null}
