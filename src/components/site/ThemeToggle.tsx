@@ -17,9 +17,9 @@ const CHOICES: { value: ThemePreference; label: string; Icon: LucideIcon }[] = [
 
 // Same visually hidden radio pattern as the tool settings, styled as a segmented control.
 const CHOICE =
-	'flex min-h-9 min-w-9 cursor-pointer items-center justify-center gap-1.5 rounded-full px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground ' +
+	'flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-1.5 rounded-full px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground ' +
 	'has-checked:bg-card has-checked:text-foreground has-checked:shadow-sm ' +
-	'has-focus-visible:ring-3 has-focus-visible:ring-ring/50';
+	'has-focus-visible:ring-3 has-focus-visible:ring-ring';
 
 export default function ThemeToggle() {
 	// The server can't know the stored choice, so it renders System and the effect syncs.

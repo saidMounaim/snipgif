@@ -214,7 +214,7 @@ export default function Compressor() {
 			{gif && originalUrl ? (
 				<Card className="gap-6 rounded-3xl p-6 shadow-xl shadow-primary/5 sm:p-8">
 					<div className="flex items-start gap-3">
-						<span aria-hidden="true" className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand text-white shadow-md shadow-primary/25">
+						<span aria-hidden="true" className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand text-brand-foreground shadow-md shadow-primary/25">
 							<Image className="size-5" />
 						</span>
 						<div className="flex min-w-0 flex-col gap-1.5">

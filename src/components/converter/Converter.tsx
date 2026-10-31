@@ -9,6 +9,7 @@ import DropZone from './DropZone';
 import GifResult, { type ResultFeedback } from './GifResult';
 import OutputSettingsPanel from './OutputSettingsPanel';
 import PlaybackPanel, { PLAYBACK_LIMIT_ID } from './PlaybackPanel';
+import StepIndicator, { type FlowStep } from './StepIndicator';
 import TextPanel from './TextPanel';
 import TrimTimeline, { type FramePreview } from './TrimTimeline';
 import {
@@ -317,13 +318,15 @@ export default function Converter() {
 					? feedback.text
 					: '';
 	const statusText = reading ? 'Reading your video...' : STATUS_MESSAGES[conversion];
+	const step: FlowStep = !video ? 'upload' : busy ? 'convert' : gif ? 'download' : 'edit';
 
 	return (
 		<div className="flex flex-col gap-4">
+			<StepIndicator step={step} />
 			{video && previewUrl ? (
 				<Card className="gap-6 rounded-3xl p-6 shadow-xl shadow-primary/5 sm:p-8">
 					<div className="flex items-start gap-3">
-						<span aria-hidden="true" className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand text-white shadow-md shadow-primary/25">
+						<span aria-hidden="true" className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand text-brand-foreground shadow-md shadow-primary/25">
 							<FileVideo className="size-5" />
 						</span>
 						<div className="flex min-w-0 flex-col gap-1.5">

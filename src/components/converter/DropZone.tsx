@@ -44,15 +44,15 @@ export default function DropZone({ title, hint, accept, onFiles, describedBy, bu
 				onDrop={handleDrop}
 				aria-describedby={describedBy}
 				className={cn(
-					'group flex w-full flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed bg-card/80 px-6 py-16 text-center shadow-xl shadow-primary/5 backdrop-blur transition-all outline-none focus-visible:ring-4 focus-visible:ring-ring/50 sm:py-20',
+					'group flex w-full flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed bg-card/80 px-6 py-16 text-center shadow-xl shadow-primary/5 backdrop-blur transition-all outline-none focus-visible:ring-4 focus-visible:ring-ring sm:py-20',
 					dragging
-						? 'scale-[1.01] border-primary bg-accent'
+						? 'border-primary bg-accent motion-safe:scale-[1.01]'
 						: 'border-input hover:border-primary hover:bg-accent/40',
 				)}
 			>
 				<span
 					aria-hidden="true"
-					className="flex size-16 items-center justify-center rounded-2xl bg-brand text-white shadow-lg shadow-primary/30 transition-transform group-hover:-translate-y-1"
+					className="flex size-16 items-center justify-center rounded-2xl bg-brand text-brand-foreground shadow-lg shadow-primary/30 transition-transform motion-safe:group-hover:-translate-y-1"
 				>
 					<Upload className="size-7" />
 				</span>

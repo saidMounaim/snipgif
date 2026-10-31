@@ -28,11 +28,13 @@
 	--success: oklch(0.52 0.14 155);
 	--border: oklch(0.915 0.012 290);
 	/* Control borders need 3:1 against the card. */
-	--input: oklch(0.66 0.025 285);
+	--input: oklch(0.65 0.025 285);
 	--ring: oklch(0.541 0.247 293);
 	--brand-from: oklch(0.56 0.25 293);
 	--brand-via: oklch(0.56 0.24 340);
 	--brand-to: oklch(0.64 0.19 45);
+	/* Text and icons on the brand gradient. */
+	--brand-foreground: oklch(0.99 0 0);
 	--radius: 0.75rem;
 }
 
@@ -61,6 +63,7 @@
 	--brand-from: oklch(0.7 0.19 293);
 	--brand-via: oklch(0.72 0.2 340);
 	--brand-to: oklch(0.8 0.15 55);
+	--brand-foreground: oklch(0.14 0.02 285);
 }
 
 @theme inline {
@@ -89,6 +92,7 @@
 	--color-brand-from: var(--brand-from);
 	--color-brand-via: var(--brand-via);
 	--color-brand-to: var(--brand-to);
+	--color-brand-foreground: var(--brand-foreground);
 	--radius-sm: calc(var(--radius) * 0.6);
 	--radius-md: calc(var(--radius) * 0.8);
 	--radius-lg: var(--radius);
@@ -120,7 +124,7 @@
 
 @layer base {
 	* {
-		@apply border-border outline-ring/50;
+		@apply border-border outline-ring;
 	}
 	html {
 		@apply font-sans;

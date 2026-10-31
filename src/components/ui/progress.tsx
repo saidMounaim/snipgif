@@ -24,7 +24,7 @@ function Progress({
         data-slot="progress-indicator"
         className={cn(
           "h-full rounded-full bg-linear-to-r from-brand-from to-brand-via transition-all",
-          indeterminate ? "w-1/3 animate-indeterminate" : "w-full flex-1"
+          indeterminate ? "w-1/3 motion-safe:animate-indeterminate" : "w-full flex-1"
         )}
         style={indeterminate ? undefined : { transform: `translateX(-${100 - value}%)` }}
       />

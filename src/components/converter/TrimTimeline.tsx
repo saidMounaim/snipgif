@@ -25,8 +25,9 @@ interface TrimTimelineProps {
 	onUnplayable: () => void;
 }
 
+// Firefox sizes the thumb without its border, so 24 px plus the 4 px border matches WebKit's 32 px.
 const THUMB =
-	'[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-7 [&::-webkit-slider-thumb]:w-7 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:shadow-primary/40 ' +
+	'[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-8 [&::-webkit-slider-thumb]:w-8 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:shadow-primary/40 ' +
 	'[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:shadow-md';
 
 // Two native range inputs share one track so keyboard and screen-reader support come for free.
@@ -277,6 +278,7 @@ export default function TrimTimeline({
 					>
 						<video
 							ref={videoRef}
+							aria-label="Video preview"
 							src={previewUrl}
 							preload="metadata"
 							playsInline
@@ -312,7 +314,7 @@ export default function TrimTimeline({
 				<>
 					<div className="relative h-11">
 						{/* Inset by half a thumb so the highlight lines up with where native thumbs can travel. */}
-						<div className="absolute inset-x-3.5 top-1/2 h-2 -translate-y-1/2 rounded-full bg-muted ring-1 ring-border ring-inset">
+						<div className="absolute inset-x-4 top-1/2 h-2 -translate-y-1/2 rounded-full bg-muted ring-1 ring-border ring-inset">
 							<div
 								className="absolute inset-y-0 rounded-full bg-linear-to-r from-brand-from to-brand-via"
 								style={{ left: `${percent(range.startSec)}%`, width: `${percent(range.endSec - range.startSec)}%` }}

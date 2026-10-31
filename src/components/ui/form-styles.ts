@@ -2,7 +2,7 @@
 export const CHOICE =
 	'inline-flex min-h-11 cursor-pointer select-none items-center gap-2 rounded-full border border-input bg-card px-4 text-sm font-medium text-foreground transition-all hover:border-primary hover:bg-accent ' +
 	'has-checked:border-transparent has-checked:bg-primary has-checked:text-primary-foreground has-checked:shadow-md has-checked:shadow-primary/25 ' +
-	'has-focus-visible:ring-3 has-focus-visible:ring-ring/50 has-focus-visible:ring-offset-2 has-focus-visible:ring-offset-card ' +
+	'has-focus-visible:ring-3 has-focus-visible:ring-ring has-focus-visible:ring-offset-2 has-focus-visible:ring-offset-card ' +
 	'has-disabled:cursor-not-allowed has-disabled:opacity-50 has-disabled:hover:border-input has-disabled:hover:bg-card';
 
 export const SLIDER =

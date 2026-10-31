@@ -16,7 +16,7 @@ const NAV = [
 	{ id: 'compressor', href: '/gif-compressor', label: 'GIF Compressor' },
 ] as const;
 
-const FOCUS = 'outline-none focus-visible:ring-3 focus-visible:ring-ring/50';
+const FOCUS = 'outline-none focus-visible:ring-3 focus-visible:ring-ring';
 ---
 
 <html lang="en">
@@ -55,7 +55,7 @@ const FOCUS = 'outline-none focus-visible:ring-3 focus-visible:ring-ring/50';
 		<header class="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-xl">
 			<div class="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
 				<a href="/" class={`flex items-center gap-2 rounded-lg text-lg font-bold tracking-tight ${FOCUS}`}>
-					<span class="flex size-8 items-center justify-center rounded-lg bg-brand text-white shadow-md shadow-primary/30">
+					<span class="flex size-8 items-center justify-center rounded-lg bg-brand text-brand-foreground shadow-md shadow-primary/30">
 						<Film aria-hidden="true" className="size-4" />
 					</span>
 					Snipgif
@@ -69,7 +69,7 @@ const FOCUS = 'outline-none focus-visible:ring-3 focus-visible:ring-ring/50';
 									<a
 										href={href}
 										aria-current={id === current ? 'page' : undefined}
-										class={`inline-flex min-h-10 w-full items-center justify-center rounded-full px-4 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:bg-card aria-[current=page]:text-foreground aria-[current=page]:shadow-sm ${FOCUS}`}
+										class={`inline-flex min-h-11 w-full items-center justify-center rounded-full px-3 text-sm whitespace-nowrap sm:px-4 font-medium text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:bg-card aria-[current=page]:text-foreground aria-[current=page]:shadow-sm ${FOCUS}`}
 									>
 										{label}
 									</a>

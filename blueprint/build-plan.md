@@ -28,7 +28,7 @@ Start with your first real slice of functionality.
 - [x] 10. **GIF compressor** - Reduce the size of existing GIFs with color reduction and frame skipping, as a standalone tool.
 - [ ] 11. **Modern responsive UI** - Mobile-first layout with dark and light mode, a clean one-page workflow, and accessible controls.
   - [x] 11a. **Theme and site shell** - Color tokens, dark/light/system theme toggle, site header with navigation, and the Inter app font.
-  - [ ] 11b. **Flow and mobile polish** - Step indicator for the converter flow, mobile layout pass, and an accessibility and contrast pass on both tools.
+  - [x] 11b. **Flow and mobile polish** - Step indicator for the converter flow, mobile layout pass, and an accessibility and contrast pass on both tools.
   - [ ] 11c. **Below the tool** - How it works, feature highlights, and an FAQ section on the home page.
 - [ ] 12. **Technical SEO foundation** - Meta tags, Open Graph and Twitter cards, sitemap.xml, robots.txt, canonical URLs, and JSON-LD structured data.
 - [ ] 13. **SEO tool landing pages** - Dedicated pages for each search intent (MP4 to GIF, MOV to GIF, WebM to GIF, GIF Compressor) with unique text and FAQ schema.

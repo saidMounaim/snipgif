@@ -55,7 +55,7 @@ export default function GifResult({ result, fileName, alt, onFeedback, children 
 	return (
 		<section
 			aria-labelledby="gif-result-heading"
-			className="flex animate-in flex-col gap-5 rounded-3xl border border-border bg-card p-6 shadow-xl shadow-primary/5 fade-in slide-in-from-bottom-4 duration-500 sm:p-8"
+			className="flex motion-safe:animate-in flex-col gap-5 rounded-3xl border border-border bg-card p-6 shadow-xl shadow-primary/5 fade-in slide-in-from-bottom-4 duration-500 sm:p-8"
 		>
 			<div className="flex items-start gap-3">
 				<span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-success/15 text-success">
@@ -73,7 +73,7 @@ export default function GifResult({ result, fileName, alt, onFeedback, children 
 				<img src={result.objectUrl} alt={alt} className="h-auto max-w-full rounded-xl shadow-md" />
 			</div>
 			{/* Stays in view at the bottom of small screens while the result is on screen. */}
-			<div className="sticky bottom-4 flex flex-wrap gap-3 sm:static">
+			<div className="sticky bottom-4 flex flex-wrap gap-3 rounded-2xl border border-border bg-card/90 p-3 shadow-lg backdrop-blur-md sm:static sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-none">
 				<Button asChild variant="brand" size="lg">
 					<a href={result.objectUrl} download={fileName} onClick={() => onFeedback(null)}>
 						<Download aria-hidden="true" />
