@@ -2,9 +2,29 @@
 import Layout from '../layouts/Layout.astro';
 import Hero from '../components/site/Hero.astro';
 import Compressor from '../components/compressor/Compressor';
+import JsonLd from '../components/site/JsonLd.astro';
+
+const title = 'GIF Compressor - Snipgif';
+const description =
+	'Make GIFs smaller right in your browser. Cut colors, skip frames, or shrink the width. No upload, no watermark, no sign-up.';
 ---
 
-<Layout title="GIF Compressor - Snipgif" current="compressor">
+<Layout title={title} description={description} current="compressor">
+	<JsonLd
+		slot="head"
+		data={{
+			'@context': 'https://schema.org',
+			'@type': 'WebApplication',
+			name: 'Snipgif GIF Compressor',
+			url: new URL('/gif-compressor', Astro.site).href,
+			description,
+			applicationCategory: 'MultimediaApplication',
+			operatingSystem: 'Any',
+			browserRequirements: 'Requires JavaScript and WebAssembly',
+			isAccessibleForFree: true,
+			offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+		}}
+	/>
 	<main class="mx-auto flex w-full max-w-3xl flex-col gap-10 px-4 pt-14 pb-16 sm:pt-20">
 		<Hero
 			lead="Make your GIFs smaller,"

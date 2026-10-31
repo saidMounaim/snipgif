@@ -1,11 +1,19 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import { loadEnv } from 'vite';
 
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 
+const { PUBLIC_SITE_URL } = loadEnv(process.env.NODE_ENV ?? 'production', process.cwd(), '');
+
 // https://astro.build/config
 export default defineConfig({
+  site: (PUBLIC_SITE_URL || 'https://snipgif.com').replace(/\/+$/, ''),
+  // Slash-less URLs match the nav links; `file` output lets Cloudflare Pages serve them without a redirect.
+  trailingSlash: 'never',
+  build: { format: 'file' },
+
   integrations: [react()],
 
   vite: {

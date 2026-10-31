@@ -5,9 +5,31 @@ import Converter from '../components/converter/Converter';
 import HowItWorks from '../components/home/HowItWorks.astro';
 import Highlights from '../components/home/Highlights.astro';
 import Faq from '../components/home/Faq.astro';
+import JsonLd from '../components/site/JsonLd.astro';
+
+const title = 'Snipgif - Free Video to GIF Converter, Private and Fast';
+const description =
+	'Turn any MP4, MOV, WebM, or AVI video into a GIF right in your browser. Trim, crop, add captions, and resize. No upload, no watermark, no sign-up.';
+const url = new URL('/', Astro.site).href;
 ---
 
-<Layout title="Snipgif" current="converter">
+<Layout title={title} description={description} current="converter">
+	<JsonLd slot="head" data={{ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Snipgif', url }} />
+	<JsonLd
+		slot="head"
+		data={{
+			'@context': 'https://schema.org',
+			'@type': 'WebApplication',
+			name: 'Snipgif Video to GIF Converter',
+			url,
+			description,
+			applicationCategory: 'MultimediaApplication',
+			operatingSystem: 'Any',
+			browserRequirements: 'Requires JavaScript and WebAssembly',
+			isAccessibleForFree: true,
+			offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+		}}
+	/>
 	<main class="mx-auto flex w-full max-w-3xl flex-col gap-10 px-4 pt-14 pb-16 sm:pt-20">
 		<Hero
 			lead="Turn any video into a GIF,"

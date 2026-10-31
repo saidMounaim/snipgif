@@ -5,11 +5,18 @@ import ThemeToggle from '../components/site/ThemeToggle';
 
 interface Props {
 	title: string;
+	description: string;
 	// The page the main navigation marks as current.
 	current: 'converter' | 'compressor';
 }
 
-const { title, current } = Astro.props;
+const { title, description, current } = Astro.props;
+
+// With `build.format: 'file'` the build-time pathname ends in `.html`; canonicals use the served, slash-less URL.
+const canonicalPath = Astro.url.pathname.replace(/(index)?\.html$/, '').replace(/(.)\/$/, '$1') || '/';
+const canonical = new URL(canonicalPath, Astro.site).href;
+const ogImage = new URL('/og-image.png', Astro.site).href;
+const OG_IMAGE_ALT = 'Snipgif: turn any video into a GIF, free, fast, and private';
 
 const NAV = [
 	{ id: 'converter', href: '/', label: 'Video to GIF' },
@@ -24,9 +31,26 @@ const FOCUS = 'outline-none focus-visible:ring-3 focus-visible:ring-ring';
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Snipgif" />
+		<meta property="og:locale" content="en_US" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content={OG_IMAGE_ALT} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImage} />
+		<meta name="twitter:image:alt" content={OG_IMAGE_ALT} />
 		<script is:inline>
 			// Applies the theme before first paint so there is no flash; mirrors resolveTheme in src/lib/theme.ts.
 			(() => {
@@ -43,6 +67,7 @@ const FOCUS = 'outline-none focus-visible:ring-3 focus-visible:ring-ring';
 				} catch {}
 			})();
 		</script>
+		<slot name="head" />
 	</head>
 	<body class="relative isolate min-h-screen overflow-x-hidden antialiased">
 		<!-- Soft brand glow behind the page; purely decorative. -->

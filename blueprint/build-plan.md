@@ -30,7 +30,7 @@ Start with your first real slice of functionality.
   - [x] 11a. **Theme and site shell** - Color tokens, dark/light/system theme toggle, site header with navigation, and the Inter app font.
   - [x] 11b. **Flow and mobile polish** - Step indicator for the converter flow, mobile layout pass, and an accessibility and contrast pass on both tools.
   - [x] 11c. **Below the tool** - How it works, feature highlights, and an FAQ section on the home page.
-- [ ] 12. **Technical SEO foundation** - Meta tags, Open Graph and Twitter cards, sitemap.xml, robots.txt, canonical URLs, and JSON-LD structured data.
+- [x] 12. **Technical SEO foundation** - Meta tags, Open Graph and Twitter cards, sitemap.xml, robots.txt, canonical URLs, and JSON-LD structured data.
 - [ ] 13. **SEO tool landing pages** - Dedicated pages for each search intent (MP4 to GIF, MOV to GIF, WebM to GIF, GIF Compressor) with unique text and FAQ schema.
 - [ ] 14. **Performance optimization** - Lazy-load the converter, optimize images and fonts, and keep Core Web Vitals in the green for better Google rankings.
 - [ ] 15. **Trust and legal pages** - About, Contact, Privacy Policy, Terms of Use, and Cookie Policy (AdSense requires these for approval).
