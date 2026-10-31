@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+// The same hashed file global.css's Latin @font-face points at, so the preload is reused rather than fetched twice.
+import geistLatinUrl from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
 import { Film } from 'lucide-react';
 import ThemeToggle from '../components/site/ThemeToggle';
 
@@ -36,6 +38,8 @@ const FOCUS = 'outline-none focus-visible:ring-3 focus-visible:ring-ring';
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
+		<!-- Fetch the UI font with the HTML so the hero text doesn't re-wrap when it swaps in. -->
+		<link rel="preload" href={geistLatinUrl} as="font" type="font/woff2" crossorigin />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />

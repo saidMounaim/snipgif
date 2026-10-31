@@ -1,5 +1,5 @@
-import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile, toBlobURL } from '@ffmpeg/util';
+// Type-only: the ffmpeg packages load in createEngine so pages don't download them until a tool needs them.
+import type { FFmpeg } from '@ffmpeg/ffmpeg';
 import type { ClipRange } from './clip-range';
 import { cropFilter, type Crop } from './crop';
 import { QUALITY_COLORS, type OutputSettings } from './output-settings';
@@ -58,15 +58,27 @@ async function guard<T>(engine: FFmpeg, call: Promise<T>): Promise<T> {
 	}
 }
 
-async function createEngine(): Promise<FFmpeg> {
-	const instance = new FFmpeg();
+// Same bytes @ffmpeg/util's fetchFile produces for a File, without loading that package up front.
+async function readFileBytes(file: File): Promise<Uint8Array> {
 	try {
+		return new Uint8Array(await file.arrayBuffer());
+	} catch (reason) {
+		throw asMemoryError(reason) ?? reason;
+	}
+}
+
+async function createEngine(): Promise<FFmpeg> {
+	let instance: FFmpeg | null = null;
+	try {
+		// A failed chunk download (offline, missing file) lands in the same EngineLoadError as a blocked CDN.
+		const [{ FFmpeg }, { toBlobURL }] = await Promise.all([import('@ffmpeg/ffmpeg'), import('@ffmpeg/util')]);
+		instance = new FFmpeg();
 		await instance.load({
 			coreURL: await toBlobURL(`${CORE_BASE_URL}/ffmpeg-core.js`, 'text/javascript'),
 			wasmURL: await toBlobURL(`${CORE_BASE_URL}/ffmpeg-core.wasm`, 'application/wasm'),
 		});
 	} catch (error) {
-		instance.terminate();
+		instance?.terminate();
 		throw new EngineLoadError('ffmpeg core failed to load', { cause: error });
 	}
 	ffmpeg = instance;
@@ -95,9 +107,7 @@ export async function prepareInput(video: SourceVideo): Promise<void> {
 	selected = video;
 	const name = `input.${video.format}`;
 	const ready = getEngine().then(async (engine) => {
-		const data = await fetchFile(video.file).catch((reason: unknown) => {
-			throw asMemoryError(reason) ?? reason;
-		});
+		const data = await readFileBytes(video.file);
 		await guard(engine, engine.writeFile(name, data));
 	});
 	const current = { video, name, ready };
@@ -289,9 +299,7 @@ export async function compressGif(file: File, settings: GifSettings, sourceWidth
 	const collect = ({ message }: { message: string }) => lines.push(message);
 	engine.on('log', collect);
 	try {
-		const data = await fetchFile(file).catch((reason: unknown) => {
-			throw asMemoryError(reason) ?? reason;
-		});
+		const data = await readFileBytes(file);
 		await guard(engine, engine.writeFile(source, data));
 		const exitCode = await guard(engine, engine.exec(['-i', source, '-vf', filter, '-loop', '0', output]));
 		if (exitCode !== 0) {
