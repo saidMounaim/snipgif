@@ -1,0 +1,59 @@
+---
+import { ChevronDown } from 'lucide-react';
+
+const LINK =
+	'rounded font-medium text-secondary-foreground underline underline-offset-4 outline-none hover:text-primary focus-visible:ring-3 focus-visible:ring-ring';
+// Answers with a link are written in the template instead of as strings.
+const FAQ = [
+	{ question: 'Is Snipgif free?', answer: 'Yes. There is no sign-up and no watermark.' },
+	{
+		question: 'Are my videos uploaded anywhere?',
+		answer:
+			'No. Your video is converted on your device with ffmpeg.wasm. The converter engine (about 30 MB) is downloaded the first time you choose a video. Your files are not.',
+	},
+	{
+		question: 'Which video formats can I use?',
+		answer: "MP4, MOV, WebM, and AVI. Some videos your browser can't play still convert, with still-frame previews.",
+	},
+	{
+		question: 'How long can a GIF be?',
+		answer: 'Up to 30 seconds, after speed and boomerang changes. Videos over 200 MB can be slow or fail on some devices.',
+	},
+	{ question: 'How do I make my GIF smaller?', answer: null },
+	{
+		question: 'Does it work on my phone?',
+		answer:
+			'Yes, in modern mobile browsers. Long or very large videos may run out of memory on phones. A shorter clip or a smaller width helps.',
+	},
+];
+---
+
+<section aria-labelledby="faq-heading" class="flex flex-col gap-6">
+	<h2 id="faq-heading" class="text-center text-2xl font-bold tracking-tight sm:text-3xl">Frequently asked questions</h2>
+	<div class="flex flex-col gap-3">
+		{
+			FAQ.map(({ question, answer }) => (
+				<details class="group rounded-2xl border border-border bg-card shadow-sm">
+					<summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 rounded-2xl px-5 py-3 font-semibold text-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
+						{question}
+						<ChevronDown
+							aria-hidden="true"
+							className="size-5 shrink-0 text-muted-foreground motion-safe:transition-transform group-open:rotate-180"
+						/>
+					</summary>
+					<p class="px-5 pb-4 text-sm text-muted-foreground">
+						{answer ?? (
+							<>
+								Choose the "Small for chat" preset, lower the frames per second or width, or run it through the{' '}
+								<a href="/gif-compressor" class={LINK}>
+									GIF Compressor
+								</a>
+								.
+							</>
+						)}
+					</p>
+				</details>
+			))
+		}
+	</div>
+</section>

@@ -1,0 +1,30 @@
+---
+const STEPS = [
+	{ title: 'Choose a video', text: 'Drop in an MP4, MOV, WebM, or AVI file, or pick one from your device.' },
+	{ title: 'Trim and adjust', text: 'Pick the moment you want, then crop, change the speed, or add a caption.' },
+	{ title: 'Convert', text: 'Your browser turns the clip into a GIF in seconds, right on your device.' },
+	{ title: 'Download or share', text: 'Save the GIF, copy it, or share it straight to your favorite app.' },
+];
+---
+
+<section aria-labelledby="how-it-works-heading" class="flex flex-col gap-6">
+	<h2 id="how-it-works-heading" class="text-center text-2xl font-bold tracking-tight sm:text-3xl">How it works</h2>
+	<ol class="grid gap-4 sm:grid-cols-2">
+		{
+			STEPS.map(({ title, text }, index) => (
+				<li class="flex gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm">
+					<span
+						aria-hidden="true"
+						class="flex size-9 shrink-0 items-center justify-center rounded-full bg-linear-to-r from-brand-from to-brand-via text-sm font-semibold text-brand-foreground"
+					>
+						{index + 1}
+					</span>
+					<div class="flex flex-col gap-1">
+						<h3 class="font-semibold text-foreground">{title}</h3>
+						<p class="text-sm text-muted-foreground">{text}</p>
+					</div>
+				</li>
+			))
+		}
+	</ol>
+</section>

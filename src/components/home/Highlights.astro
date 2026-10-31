@@ -1,0 +1,42 @@
+---
+import { Gauge, Minimize2, Scissors, ShieldCheck, Sparkles, Type } from 'lucide-react';
+
+const HIGHLIGHTS = [
+	{ Icon: ShieldCheck, title: 'Private by design', text: 'Conversion runs in your browser, so your video is never uploaded.' },
+	{ Icon: Sparkles, title: 'Free, no watermark', text: 'No sign-up, and never a watermark on your GIF.' },
+	{ Icon: Scissors, title: 'Trim and crop', text: 'Pick the exact moment and crop to 1:1, 16:9, or 9:16.' },
+	{ Icon: Gauge, title: 'Speed, reverse, boomerang', text: 'Change the playback speed, play it backward, or loop it back and forth.' },
+	{ Icon: Type, title: 'Add captions', text: 'Meme-style top and bottom text in three fonts and six colors.' },
+];
+---
+
+<section aria-labelledby="highlights-heading" class="flex flex-col gap-6">
+	<h2 id="highlights-heading" class="text-center text-2xl font-bold tracking-tight sm:text-3xl">Everything you need</h2>
+	<ul class="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+		{
+			HIGHLIGHTS.map(({ Icon, title, text }) => (
+				<li class="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 shadow-sm">
+					<span aria-hidden="true" class="flex size-10 items-center justify-center rounded-xl bg-brand text-brand-foreground shadow-md shadow-primary/25">
+						<Icon className="size-5" />
+					</span>
+					<h3 class="font-semibold text-foreground">{title}</h3>
+					<p class="text-sm text-muted-foreground">{text}</p>
+				</li>
+			))
+		}
+		<li class="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 shadow-sm">
+			<span aria-hidden="true" class="flex size-10 items-center justify-center rounded-xl bg-brand text-brand-foreground shadow-md shadow-primary/25">
+				<Minimize2 className="size-5" />
+			</span>
+			<h3 class="font-semibold text-foreground">Presets and compression</h3>
+			<p class="text-sm text-muted-foreground">
+				One-click presets for chat or quality, plus a{' '}
+				<a
+					href="/gif-compressor"
+					class="rounded font-medium text-secondary-foreground underline underline-offset-4 outline-none hover:text-primary focus-visible:ring-3 focus-visible:ring-ring"
+					>GIF Compressor</a
+				> to shrink GIFs you already have.
+			</p>
+		</li>
+	</ul>
+</section>

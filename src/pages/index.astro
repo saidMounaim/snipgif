@@ -2,6 +2,9 @@
 import Layout from '../layouts/Layout.astro';
 import Hero from '../components/site/Hero.astro';
 import Converter from '../components/converter/Converter';
+import HowItWorks from '../components/home/HowItWorks.astro';
+import Highlights from '../components/home/Highlights.astro';
+import Faq from '../components/home/Faq.astro';
 ---
 
 <Layout title="Snipgif" current="converter">
@@ -12,5 +15,10 @@ import Converter from '../components/converter/Converter';
 			description="Trim, crop, add captions, and tune the size. Everything runs right in your browser."
 		/>
 		<Converter client:load />
+		<div class="mt-10 flex flex-col gap-16">
+			<HowItWorks />
+			<Highlights />
+			<Faq />
+		</div>
 	</main>
 </Layout>
