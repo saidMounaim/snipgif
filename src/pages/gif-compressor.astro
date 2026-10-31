@@ -1,12 +1,17 @@
 ---
+import { getEntry, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import Hero from '../components/site/Hero.astro';
 import Compressor from '../components/compressor/Compressor';
+import Faq from '../components/home/Faq.astro';
 import JsonLd from '../components/site/JsonLd.astro';
+import LandingText from '../components/landing/LandingText.astro';
+import { faqPageSchema } from '../lib/faq-schema';
 
-const title = 'GIF Compressor - Snipgif';
-const description =
-	'Make GIFs smaller right in your browser. Cut colors, skip frames, or shrink the width. No upload, no watermark, no sign-up.';
+const entry = await getEntry('landing', 'gif-compressor');
+if (!entry) throw new Error('Missing landing entry: gif-compressor');
+const { Content } = await render(entry);
+const { title, description, appName, hero, faq } = entry.data;
 ---
 
 <Layout title={title} description={description} current="compressor">
@@ -15,7 +20,7 @@ const description =
 		data={{
 			'@context': 'https://schema.org',
 			'@type': 'WebApplication',
-			name: 'Snipgif GIF Compressor',
+			name: appName,
 			url: new URL('/gif-compressor', Astro.site).href,
 			description,
 			applicationCategory: 'MultimediaApplication',
@@ -25,12 +30,13 @@ const description =
 			offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
 		}}
 	/>
+	<JsonLd slot="head" data={faqPageSchema(faq)} />
 	<main class="mx-auto flex w-full max-w-3xl flex-col gap-10 px-4 pt-14 pb-16 sm:pt-20">
-		<Hero
-			lead="Make your GIFs smaller,"
-			highlight="free, fast, and private"
-			description="Cut colors, skip frames, or shrink the width. Everything runs right in your browser."
-		/>
+		<Hero lead={hero.lead} highlight={hero.highlight} description={hero.description} />
 		<Compressor client:load />
+		<div class="mt-10 flex flex-col gap-16">
+			<LandingText><Content /></LandingText>
+			<Faq items={faq} />
+		</div>
 	</main>
 </Layout>

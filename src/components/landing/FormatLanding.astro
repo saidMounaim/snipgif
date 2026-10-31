@@ -1,0 +1,47 @@
+---
+import { getEntry, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../site/Hero.astro';
+import Converter from '../converter/Converter';
+import Faq from '../home/Faq.astro';
+import JsonLd from '../site/JsonLd.astro';
+import LandingText from './LandingText.astro';
+import { faqPageSchema } from '../../lib/faq-schema';
+
+interface Props {
+	// A `landing` collection entry id, which is also the page's slug.
+	id: string;
+}
+
+const entry = await getEntry('landing', Astro.props.id);
+if (!entry) throw new Error(`Missing landing entry: ${Astro.props.id}`);
+const { Content } = await render(entry);
+const { title, description, appName, hero, faq } = entry.data;
+---
+
+<Layout title={title} description={description}>
+	<JsonLd
+		slot="head"
+		data={{
+			'@context': 'https://schema.org',
+			'@type': 'WebApplication',
+			name: appName,
+			url: new URL(`/${entry.id}`, Astro.site).href,
+			description,
+			applicationCategory: 'MultimediaApplication',
+			operatingSystem: 'Any',
+			browserRequirements: 'Requires JavaScript and WebAssembly',
+			isAccessibleForFree: true,
+			offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+		}}
+	/>
+	<JsonLd slot="head" data={faqPageSchema(faq)} />
+	<main class="mx-auto flex w-full max-w-3xl flex-col gap-10 px-4 pt-14 pb-16 sm:pt-20">
+		<Hero lead={hero.lead} highlight={hero.highlight} description={hero.description} />
+		<Converter client:load />
+		<div class="mt-10 flex flex-col gap-16">
+			<LandingText><Content /></LandingText>
+			<Faq items={faq} />
+		</div>
+	</main>
+</Layout>

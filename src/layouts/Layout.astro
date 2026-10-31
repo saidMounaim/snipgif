@@ -6,8 +6,8 @@ import ThemeToggle from '../components/site/ThemeToggle';
 interface Props {
 	title: string;
 	description: string;
-	// The page the main navigation marks as current.
-	current: 'converter' | 'compressor';
+	// The page the main navigation marks as current; landing pages have none.
+	current?: 'converter' | 'compressor';
 }
 
 const { title, description, current } = Astro.props;
@@ -22,6 +22,13 @@ const NAV = [
 	{ id: 'converter', href: '/', label: 'Video to GIF' },
 	{ id: 'compressor', href: '/gif-compressor', label: 'GIF Compressor' },
 ] as const;
+
+const TOOL_LINKS = [
+	{ href: '/mp4-to-gif', label: 'MP4 to GIF' },
+	{ href: '/mov-to-gif', label: 'MOV to GIF' },
+	{ href: '/webm-to-gif', label: 'WebM to GIF' },
+	{ href: '/gif-compressor', label: 'GIF Compressor' },
+];
 
 const FOCUS = 'outline-none focus-visible:ring-3 focus-visible:ring-ring';
 ---
@@ -107,8 +114,24 @@ const FOCUS = 'outline-none focus-visible:ring-3 focus-visible:ring-ring';
 			</div>
 		</header>
 		<slot />
-		<footer class="mx-auto w-full max-w-3xl px-4 pb-10 text-center text-sm text-muted-foreground">
-			Made in your browser. Nothing is uploaded.
+		<footer class="mx-auto flex w-full max-w-3xl flex-col items-center gap-3 px-4 pb-10 text-center text-sm text-muted-foreground">
+			<nav aria-label="Tools">
+				<ul class="flex flex-wrap justify-center gap-x-2">
+					{
+						TOOL_LINKS.map(({ href, label }) => (
+							<li>
+								<a
+									href={href}
+									class={`inline-flex min-h-11 items-center rounded-lg px-2 font-medium transition-colors hover:text-foreground ${FOCUS}`}
+								>
+									{label}
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</nav>
+			<p>Made in your browser. Nothing is uploaded.</p>
 		</footer>
 	</body>
 </html>
