@@ -18,4 +18,16 @@ const landing = defineCollection({
 	}),
 });
 
-export const collections = { landing };
+// About and legal copy; the filename is the URL slug.
+const pages = defineCollection({
+	loader: glob({ pattern: '*.md', base: './src/content/pages' }),
+	schema: z.object({
+		title: z.string(),
+		description: z.string(),
+		heading: z.string(),
+		// Shown as "Last updated" on the policy pages.
+		updated: z.coerce.date().optional(),
+	}),
+});
+
+export const collections = { landing, pages };

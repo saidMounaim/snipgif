@@ -32,6 +32,16 @@ const TOOL_LINKS = [
 	{ href: '/gif-compressor', label: 'GIF Compressor' },
 ];
 
+const SITE_LINKS = [
+	{ href: '/about', label: 'About' },
+	{ href: '/contact', label: 'Contact' },
+	{ href: '/privacy', label: 'Privacy' },
+	{ href: '/terms', label: 'Terms' },
+	{ href: '/cookies', label: 'Cookies' },
+];
+
+const FOOTER_LINK = 'inline-flex min-h-11 items-center rounded-lg px-2 font-medium transition-colors hover:text-foreground';
+
 const FOCUS = 'outline-none focus-visible:ring-3 focus-visible:ring-ring';
 ---
 
@@ -124,10 +134,20 @@ const FOCUS = 'outline-none focus-visible:ring-3 focus-visible:ring-ring';
 					{
 						TOOL_LINKS.map(({ href, label }) => (
 							<li>
-								<a
-									href={href}
-									class={`inline-flex min-h-11 items-center rounded-lg px-2 font-medium transition-colors hover:text-foreground ${FOCUS}`}
-								>
+								<a href={href} class={`${FOOTER_LINK} ${FOCUS}`}>
+									{label}
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</nav>
+			<nav aria-label="Site">
+				<ul class="flex flex-wrap justify-center gap-x-2">
+					{
+						SITE_LINKS.map(({ href, label }) => (
+							<li>
+								<a href={href} class={`${FOOTER_LINK} ${FOCUS}`}>
 									{label}
 								</a>
 							</li>

@@ -1,0 +1,37 @@
+---
+import { Mail } from 'lucide-react';
+import Layout from '../layouts/Layout.astro';
+import ContactForm from '../components/contact/ContactForm';
+import { CONTACT_EMAIL } from '../lib/site';
+
+// Build-time public value; anything that is not a plain Formspree form ID is treated as unset.
+const rawFormspreeId: unknown = import.meta.env.PUBLIC_FORMSPREE_ID;
+const formspreeId =
+	typeof rawFormspreeId === 'string' && /^[A-Za-z0-9]+$/.test(rawFormspreeId) ? rawFormspreeId : null;
+---
+
+<Layout
+	title="Contact Snipgif - Questions, Bugs, and Feedback"
+	description="Get in touch with Snipgif. Report a bug, suggest a feature, or ask about privacy by email or through the contact form."
+>
+	<main class="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 pt-14 pb-16 sm:pt-20">
+		<header class="flex flex-col gap-3">
+			<h1 class="text-4xl font-extrabold tracking-tight text-balance sm:text-5xl">Contact</h1>
+			<p class="text-base text-pretty text-muted-foreground sm:text-lg">
+				Found a bug, have an idea, or a question about privacy? Send a message and Snipgif will get back to you
+				by email.
+			</p>
+		</header>
+		<p class="flex flex-wrap items-center gap-2 text-base text-muted-foreground">
+			<Mail aria-hidden="true" className="size-5 text-secondary-foreground" />
+			Email
+			<a
+				href={`mailto:${CONTACT_EMAIL}`}
+				class="rounded font-medium text-secondary-foreground underline underline-offset-4 outline-none focus-visible:ring-3 focus-visible:ring-ring"
+			>
+				{CONTACT_EMAIL}
+			</a>
+		</p>
+		{formspreeId && <ContactForm client:visible endpoint={`https://formspree.io/f/${formspreeId}`} />}
+	</main>
+</Layout>

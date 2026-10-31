@@ -1,0 +1,48 @@
+---
+import { getEntry, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import LandingText from '../landing/LandingText.astro';
+import { CONTACT_EMAIL } from '../../lib/site';
+
+interface Props {
+	// The `pages` entry, which is also the page's URL slug.
+	id: string;
+}
+
+const { id } = Astro.props;
+const entry = await getEntry('pages', id);
+if (!entry) throw new Error(`Missing pages entry: ${id}`);
+const { Content } = await render(entry);
+const { title, description, heading, updated } = entry.data;
+
+const updatedLabel = updated?.toLocaleDateString('en-US', {
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+	timeZone: 'UTC',
+});
+---
+
+<Layout title={title} description={description}>
+	<main class="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 pt-14 pb-16 sm:pt-20">
+		<header class="flex flex-col gap-3">
+			<h1 class="text-4xl font-extrabold tracking-tight text-balance sm:text-5xl">{heading}</h1>
+			{
+				updated && (
+					<p class="text-sm text-muted-foreground">
+						Last updated <time datetime={updated.toISOString().slice(0, 10)}>{updatedLabel}</time>
+					</p>
+				)
+			}
+		</header>
+		<LandingText>
+			<Content />
+			<!-- Rendered from the shared constant so the address in the copy can never drift. -->
+			<h2>Contact</h2>
+			<p>
+				Questions about this page? Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> or use the
+				<a href="/contact">contact page</a>.
+			</p>
+		</LandingText>
+	</main>
+</Layout>
