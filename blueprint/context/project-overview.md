@@ -1,6 +1,6 @@
 # Snipgif - Project Overview
 
-<!-- blueprint:source-hash 3d9cbb6ac972059cce0900feb6f906b1436de558e4716b6556bda39f65ff79c5 -->
+<!-- blueprint:source-hash 7f80fa546a0b28dbe76a0d269c3984ad32d81a7d17a67fd5e41de7e6142e57d7 -->
 
 > A fast, free, private video-to-GIF converter that runs entirely in the browser:
 > no upload, no watermark, no sign-up. Upload, trim, convert, download in under a
@@ -27,8 +27,8 @@ All users are anonymous; there is one access tier.
 - **Students and teachers** - short animations for presentations and lessons.
 
 Most arrive from Google search, use the tool once or occasionally, expect it to
-work instantly without an account, and many are on phones. Languages: English
-first, then French, Arabic (RTL), and Spanish.
+work instantly without an account, and many are on phones. The site is English
+only.
 
 ## Usage model
 
@@ -80,7 +80,6 @@ In build-plan order. The headline is the converter flow, features 1 to 6.
 15. **Trust and legal pages** - About, Contact, Privacy Policy, Terms of Use,
     Cookie Policy (needed for AdSense approval).
 16. **Blog and guides** - how-to articles for long-tail search traffic.
-17. **Multilingual support** - EN, FR, AR (RTL), ES with hreflang tags.
 18. **Analytics** - visits, completed conversions, popular settings.
 19. **Cookie consent banner** - Google-certified CMP for EU/UK ad consent.
 20. **Google AdSense integration** - non-intrusive slots that never block the
@@ -114,7 +113,6 @@ memory and are discarded when the tab closes.
 ### User preferences (localStorage)
 
 - `theme` (`"system" | "light" | "dark"`)
-- `language` (`"en" | "fr" | "ar" | "es"`)
 - `lastSettings` (`OutputSettings`)
 
 ### Consent (cookie)
@@ -123,8 +121,8 @@ memory and are discarded when the tab closes.
 
 ### Content (Markdown in repo, Astro content collections)
 
-- Blog post / guide - `title`, `description`, `lang`, `slug`, publish date, body.
-- Landing page and FAQ copy per format and per language.
+- Blog post / guide - `title`, `description`, `slug`, publish date, body.
+- Landing page and FAQ copy per format.
 
 > Exact frontmatter fields are a TODO for features 13 and 16.
 
@@ -139,8 +137,8 @@ memory and are discarded when the tab closes.
 
 ## Tech stack
 
-- **Astro** - static HTML output that Google indexes easily, built-in i18n
-  routing, content collections for blog and copy.
+- **Astro** - static HTML output that Google indexes easily, plus content
+  collections for blog and copy.
 - **React (Astro island)** - the interactive converter; only converter pages ship
   JavaScript.
 - **TypeScript** - throughout.
@@ -179,12 +177,10 @@ Squoosh and Remove.bg, where the tool is the page.
 - **Mobile-first:** large touch targets, thumb-friendly timeline, sticky download
   button on small screens.
 - **Theme:** follows the system with a manual toggle.
-- **RTL:** fully mirrored Arabic layout.
 - **Below the tool:** "How it works", feature highlights, FAQ.
 - **Accessibility:** keyboard navigation, visible focus, good contrast, alt text.
 
-Routes (slugs indicative, finalize in each feature spec; FR/AR/ES under locale
-prefixes such as `/fr/`):
+Routes (slugs indicative, finalize in each feature spec):
 
 - `/` - converter (hero, flow, how it works, FAQ)
 - `/mp4-to-gif`, `/mov-to-gif`, `/webm-to-gif` - format landing pages with the
@@ -228,6 +224,3 @@ prefixes such as `/fr/`):
   base layout and theme that earlier features should already use.
 - **Output ranges and presets.** FPS, width, and quality ranges and what each
   preset sets are not defined.
-- **Language preference.** Section 4 stores language in localStorage while
-  feature 17 uses locale URLs; confirm the URL is authoritative and storage is
-  only a redirect hint.

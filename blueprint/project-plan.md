@@ -35,7 +35,7 @@ revenue through respectful advertising.
 
 Most users arrive from Google search, use the tool once or occasionally, and
 expect it to work instantly without an account. Many visit on mobile phones.
-Target languages: English first, then French, Arabic, and Spanish.
+The site is English only.
 
 ## 3. Features - What does the MVP need?
 
@@ -67,11 +67,11 @@ and is discarded when the tab closes. There is no database in the MVP.
 
 What is stored:
 
-- **User preferences (browser localStorage):** theme, language, and last-used
-  conversion settings
+- **User preferences (browser localStorage):** theme and last-used conversion
+  settings
 - **Cookie consent choice (cookie):** managed by the consent platform
 - **Blog and guide content (Markdown files in the repo):** articles, FAQ text,
-  and landing page copy for each language
+  and landing page copy
 - **Anonymous analytics (third-party):** page views, conversions started and
   completed, chosen presets, errors, and device type, with no personal data
 - **Static config files:** `ads.txt` for AdSense, `sitemap.xml`, `robots.txt`
@@ -79,7 +79,7 @@ What is stored:
 ## 5. Tech - What stack are we using?
 
 - **Framework:** Astro, because it outputs fast static HTML that Google indexes
-  easily, has built-in i18n routing, and content collections for the blog
+  easily and has content collections for the blog
 - **Interactive converter:** React component loaded as an Astro island, so only
   the converter page ships JavaScript
 - **Styling:** Tailwind CSS with the app's own small components (no shadcn/ui)
@@ -105,8 +105,8 @@ What is stored:
   progress bar
 - No pop-ups, no interstitials, and no ads that shift the layout, to protect
   user trust and Core Web Vitals
-- Traffic strategy: rank on Google through format landing pages, multilingual
-  pages, and how-to blog posts
+- Traffic strategy: rank on Google through format landing pages and how-to
+  blog posts
 
 **Phase 2 - Optional later ideas (not in MVP):**
 
@@ -132,7 +132,6 @@ what to do within 3 seconds of landing.
 - **Mobile-first:** large touch targets, a timeline that works with thumbs, and
   a sticky download button on small screens
 - **Dark and light mode:** follows the system setting with a manual toggle
-- **RTL support:** full mirrored layout for the Arabic version
 - **Below the tool:** short "How it works" steps, feature highlights, and an FAQ
   section (good for SEO and for AdSense approval)
 - **Accessibility:** keyboard navigation, visible focus states, good color
