@@ -21,6 +21,7 @@ import {
 	type GifSettings,
 	type SourceGif,
 } from '../../lib/gif-file';
+import { track } from '../../lib/analytics';
 import { formatFileSize } from '../../lib/video-file';
 import {
 	compressGif,
@@ -145,6 +146,7 @@ export default function Compressor() {
 		const validated = validateGifFiles(files);
 		if (!validated.ok) {
 			setError(validated.error);
+			track('file_rejected', { tool: 'compressor', error: validated.error });
 			return;
 		}
 		setError(null);
@@ -177,24 +179,33 @@ export default function Compressor() {
 		if (!gif || !settings || source.state !== 'ready') return;
 		replaceResult(null);
 		setCompressionError(null);
+		const details = {
+			tool: 'compressor',
+			colors: settings.colors,
+			frame_step: settings.frameStep,
+			resized: settings.width < source.width,
+		};
 		try {
+			track('conversion_start', details);
 			setCompression('loading-core');
 			await loadGifEngine();
 			setCompression('compressing');
 			const blob = await compressGif(gif.file, settings, source.width);
 			replaceResult({ blob, objectUrl: URL.createObjectURL(blob), sizeBytes: blob.size });
 			setCompression('done');
+			track('conversion_complete', details);
 		} catch (caught) {
-			setCompression('error');
-			setCompressionError(
+			const reason: CompressionError =
 				caught instanceof EngineLoadError
 					? 'load'
 					: caught instanceof MemoryError
 						? 'memory'
 						: caught instanceof UnsupportedVideoError
 							? 'unsupported'
-							: 'convert',
-			);
+							: 'convert';
+			setCompression('error');
+			setCompressionError(reason);
+			track('conversion_error', { tool: 'compressor', error: reason });
 		}
 	}
 

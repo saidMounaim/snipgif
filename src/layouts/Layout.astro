@@ -44,6 +44,10 @@ const SITE_LINKS = [
 const FOOTER_LINK = 'inline-flex min-h-11 items-center rounded-lg px-2 font-medium transition-colors hover:text-foreground';
 
 const FOCUS = 'outline-none focus-visible:ring-3 focus-visible:ring-ring';
+
+// Build-time public value; anything that is not a GA4 measurement ID is treated as unset, so no tag loads.
+const rawGaId: unknown = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
+const gaId = typeof rawGaId === 'string' && /^G-[A-Z0-9]+$/.test(rawGaId) ? rawGaId : null;
 ---
 
 <html lang="en">
@@ -89,6 +93,39 @@ const FOCUS = 'outline-none focus-visible:ring-3 focus-visible:ring-ring';
 				} catch {}
 			})();
 		</script>
+		{
+			gaId && (
+				<>
+					<script is:inline define:vars={{ gaId }}>
+						window.dataLayer = window.dataLayer || [];
+						window.gtag = function () {
+							dataLayer.push(arguments);
+						};
+						// Consent Mode v2: storage stays denied in the EEA, UK, and Switzerland until the consent banner grants it.
+						gtag('consent', 'default', {
+							ad_storage: 'denied',
+							ad_user_data: 'denied',
+							ad_personalization: 'denied',
+							analytics_storage: 'denied',
+							region: [
+								'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT',
+								'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE',
+								'IS', 'LI', 'NO', 'GB', 'CH',
+							],
+						});
+						gtag('consent', 'default', {
+							ad_storage: 'granted',
+							ad_user_data: 'granted',
+							ad_personalization: 'granted',
+							analytics_storage: 'granted',
+						});
+						gtag('js', new Date());
+						gtag('config', gaId);
+					</script>
+					<script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} />
+				</>
+			)
+		}
 		<slot name="head" />
 	</head>
 	<body class="relative isolate min-h-screen overflow-x-hidden antialiased">

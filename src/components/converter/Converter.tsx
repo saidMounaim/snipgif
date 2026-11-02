@@ -22,6 +22,7 @@ import {
 	type VideoFileWarning,
 } from '../../lib/video-file';
 import { defaultRange, lastFrameSec, type ClipRange } from '../../lib/clip-range';
+import { track } from '../../lib/analytics';
 import type { Crop, FrameSize } from '../../lib/crop';
 import { DEFAULT_PRESET, presetSettings, type OutputSettings } from '../../lib/output-settings';
 import { DEFAULT_PLAYBACK, tooLong, type Playback } from '../../lib/playback';
@@ -230,6 +231,7 @@ export default function Converter() {
 		const result = validateVideoFiles(files);
 		if (!result.ok) {
 			setError(result.error);
+			track('file_rejected', { tool: 'converter', error: result.error });
 			return;
 		}
 		setError(null);
@@ -277,7 +279,21 @@ export default function Converter() {
 		replaceGif(null);
 		setConversionError(null);
 		setProgress(0);
+		const details = {
+			tool: 'converter',
+			preset: settings.preset ?? 'custom',
+			fps: settings.fps,
+			width: settings.width,
+			quality: settings.quality,
+			format: video.format,
+			crop: crop?.aspect ?? 'none',
+			speed: playback.speed,
+			reverse: playback.reverse,
+			boomerang: playback.boomerang,
+			caption: hasText(caption),
+		};
 		try {
+			track('conversion_start', details);
 			setConversion('loading-core');
 			const textImage = gifSize && hasText(caption) ? await renderCaptionPng(caption, gifSize) : null;
 			await loadGifEngine();
@@ -287,9 +303,9 @@ export default function Converter() {
 			);
 			replaceGif({ blob, objectUrl: URL.createObjectURL(blob), sizeBytes: blob.size });
 			setConversion('done');
+			track('conversion_complete', details);
 		} catch (caught) {
-			setConversion('error');
-			setConversionError(
+			const reason: ConversionError =
 				caught instanceof EngineLoadError
 					? 'load'
 					: caught instanceof MemoryError
@@ -298,8 +314,10 @@ export default function Converter() {
 							? 'unsupported'
 							: caught instanceof CaptionFontError
 								? 'font'
-								: 'convert',
-			);
+								: 'convert';
+			setConversion('error');
+			setConversionError(reason);
+			track('conversion_error', { tool: 'converter', error: reason });
 		}
 	}
 
