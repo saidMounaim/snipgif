@@ -1,0 +1,84 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { ArrowRight } from 'lucide-react';
+import Layout from '../../layouts/Layout.astro';
+import LandingText from '../../components/landing/LandingText.astro';
+import JsonLd from '../../components/site/JsonLd.astro';
+import { formatGuideDate, isoDate } from '../../lib/guides';
+
+export const getStaticPaths = (async () => {
+	const guides = await getCollection('blog');
+	return guides.map((guide) => ({ params: { slug: guide.id }, props: { guide } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+	guide: CollectionEntry<'blog'>;
+}
+
+const { guide } = Astro.props;
+const { Content } = await render(guide);
+const { title, description, heading, published, updated, tool } = guide.data;
+
+const TOOL_LABELS: Record<typeof tool, string> = {
+	'/': 'Open the video to GIF converter',
+	'/mp4-to-gif': 'Open the MP4 to GIF converter',
+	'/mov-to-gif': 'Open the MOV to GIF converter',
+	'/webm-to-gif': 'Open the WebM to GIF converter',
+	'/gif-compressor': 'Open the GIF compressor',
+};
+
+const url = new URL(`/blog/${guide.id}`, Astro.site).href;
+const organization = { '@type': 'Organization', name: 'Snipgif', url: new URL('/', Astro.site).href };
+---
+
+<Layout title={title} description={description}>
+	<JsonLd
+		slot="head"
+		data={{
+			'@context': 'https://schema.org',
+			'@type': 'BlogPosting',
+			headline: heading,
+			description,
+			datePublished: isoDate(published),
+			dateModified: isoDate(updated ?? published),
+			mainEntityOfPage: url,
+			url,
+			image: new URL('/og-image.png', Astro.site).href,
+			author: organization,
+			publisher: organization,
+		}}
+	/>
+	<main class="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 pt-14 pb-16 sm:pt-20">
+		<header class="flex flex-col gap-3">
+			<a
+				href="/blog"
+				class="inline-flex min-h-11 w-fit items-center rounded-lg text-sm font-medium text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring"
+			>
+				All guides
+			</a>
+			<h1 class="text-4xl font-extrabold tracking-tight text-balance sm:text-5xl">{heading}</h1>
+			<p class="text-sm text-muted-foreground">
+				Published <time datetime={isoDate(published)}>{formatGuideDate(published)}</time>
+				{
+					updated && (
+						<>
+							{' '}
+							· Updated <time datetime={isoDate(updated)}>{formatGuideDate(updated)}</time>
+						</>
+					)
+				}
+			</p>
+		</header>
+		<LandingText>
+			<Content />
+		</LandingText>
+		<a
+			href={tool}
+			class="inline-flex min-h-11 w-fit items-center gap-2 rounded-xl bg-brand px-5 font-semibold text-brand-foreground shadow-md shadow-primary/30 outline-none focus-visible:ring-3 focus-visible:ring-ring"
+		>
+			{TOOL_LABELS[tool]}
+			<ArrowRight aria-hidden="true" className="size-4" />
+		</a>
+	</main>
+</Layout>

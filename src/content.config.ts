@@ -30,4 +30,18 @@ const pages = defineCollection({
 	}),
 });
 
-export const collections = { landing, pages };
+// How-to guides at /blog/<slug>; the filename is the URL slug.
+const blog = defineCollection({
+	loader: glob({ pattern: '*.md', base: './src/content/blog' }),
+	schema: z.object({
+		title: z.string(),
+		description: z.string(),
+		heading: z.string(),
+		published: z.coerce.date(),
+		updated: z.coerce.date().optional(),
+		// The tool the closing call-to-action links to.
+		tool: z.enum(['/', '/mp4-to-gif', '/mov-to-gif', '/webm-to-gif', '/gif-compressor']),
+	}),
+});
+
+export const collections = { landing, pages, blog };

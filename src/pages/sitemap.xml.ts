@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { getCollection } from 'astro:content';
 
 // Globbing the pages folder keeps the sitemap in step as pages are added.
 const pages = Object.keys(import.meta.glob('./**/*.astro'));
@@ -13,10 +14,11 @@ function toRoute(file: string): string | null {
 const escapeXml = (value: string) =>
 	value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 
-export const GET: APIRoute = ({ site }) => {
-	const urls = pages
-		.map(toRoute)
-		.filter((route) => route !== null)
+export const GET: APIRoute = async ({ site }) => {
+	// Guides come from a dynamic route, which the glob above skips.
+	const guides = (await getCollection('blog')).map(({ id }) => `/blog/${id}`);
+	const routes = new Set([...pages.map(toRoute).filter((route) => route !== null), ...guides]);
+	const urls = [...routes]
 		.sort()
 		.map((route) => `\t<url><loc>${escapeXml(new URL(route, site).href)}</loc></url>`);
 	const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`;

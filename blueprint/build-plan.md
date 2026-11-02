@@ -34,7 +34,7 @@ Start with your first real slice of functionality.
 - [x] 13. **SEO tool landing pages** - Dedicated pages for each search intent (MP4 to GIF, MOV to GIF, WebM to GIF, GIF Compressor) with unique text and FAQ schema.
 - [x] 14. **Performance optimization** - Lazy-load the converter, optimize images and fonts, and keep Core Web Vitals in the green for better Google rankings.
 - [x] 15. **Trust and legal pages** - About, Contact, Privacy Policy, Terms of Use, and Cookie Policy (AdSense requires these for approval).
-- [ ] 16. **Blog and guides section** - How-to articles like "How to make a GIF from a video on iPhone" to attract long-tail search traffic.
+- [x] 16. **Blog and guides section** - How-to articles like "How to make a GIF from a video on iPhone" to attract long-tail search traffic.
 - [ ] 18. **Analytics** - Track visits, conversions completed, and popular settings with GA4 or a privacy-friendly alternative.
 - [ ] 19. **Cookie consent banner** - Google-certified consent management (CMP) required for showing ads to visitors in Europe and the UK.
 - [ ] 20. **Google AdSense integration** - Non-intrusive ad slots (sidebar, below the result, between blog paragraphs) that don't block the conversion flow or hurt page speed.
