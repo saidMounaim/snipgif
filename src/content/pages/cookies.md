@@ -2,7 +2,7 @@
 title: Cookie Policy | Snipgif
 description: Which cookies and browser storage Snipgif and its advertising and analytics partners use, and how to control them.
 heading: Cookie Policy
-updated: 2026-10-31
+updated: 2026-11-06
 ---
 
 This policy explains how Snipgif and its partners use cookies and similar
@@ -38,6 +38,9 @@ asked for consent before advertising or analytics cookies that need consent are
 used. Learn more about
 [how Google uses cookies in advertising](https://policies.google.com/technologies/ads)
 and manage personalized ads in [Google's My Ad Center](https://myadcenter.google.com/).
+
+You can review or change your consent choices at any time with the **Privacy and
+cookie settings** link at the bottom of every page.
 
 ## How to control cookies and storage
 

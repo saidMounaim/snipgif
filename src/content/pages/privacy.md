@@ -2,7 +2,7 @@
 title: Privacy Policy | Snipgif
 description: How Snipgif handles your data. Videos and GIFs are processed on your device and never uploaded. Learn about hosting, ads, analytics, and your rights.
 heading: Privacy Policy
-updated: 2026-10-31
+updated: 2026-11-06
 ---
 
 This policy explains what information Snipgif collects when you use
@@ -61,7 +61,9 @@ Google services to show ads and understand how the site is used:
   your videos or GIFs.
 - **Google's consent management platform** asks visitors in the European
   Economic Area, the United Kingdom, and Switzerland for consent before
-  personalized ads or analytics cookies are used, and stores that choice.
+  personalized ads or analytics cookies are used, and stores that choice. You can
+  review or change your choice at any time with the **Privacy and cookie
+  settings** link at the bottom of every page.
 
 To learn more, read
 [how Google uses information from sites that use its services](https://policies.google.com/technologies/partner-sites).
