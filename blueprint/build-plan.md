@@ -33,7 +33,7 @@ Start with your first real slice of functionality.
 - [x] 12. **Technical SEO foundation** - Meta tags, Open Graph and Twitter cards, sitemap.xml, robots.txt, canonical URLs, and JSON-LD structured data.
 - [x] 13. **SEO tool landing pages** - Dedicated pages for each search intent (MP4 to GIF, MOV to GIF, WebM to GIF, GIF Compressor) with unique text and FAQ schema.
 - [x] 14. **Performance optimization** - Lazy-load the converter, optimize images and fonts, and keep Core Web Vitals in the green for better Google rankings.
-- [x] 15. **Trust and legal pages** - About, Contact, Privacy Policy, Terms of Use, and Cookie Policy.
+- [x] 15. **Trust and legal pages** - About, Privacy Policy, Terms of Use, and Cookie Policy. The Contact page was removed by fix `remove-adsense-and-prepare-an-open-source-vercel-release` (2026-11-07); questions go to GitHub issues.
 - [x] 16. **Blog and guides section** - How-to articles like "How to make a GIF from a video on iPhone" to attract long-tail search traffic.
 - [x] 18. **Analytics** - Track visits, conversions completed, and popular settings with GA4 or a privacy-friendly alternative.
 - [x] 19. **Cookie consent banner** - Consent banner for EU and UK visitors. Removed by fix `remove-adsense-and-prepare-an-open-source-vercel-release` (2026-11-07): with no ads, no banner is needed; the Consent Mode defaults stay for GA4.

@@ -1,6 +1,6 @@
 # Snipgif - Project Overview
 
-<!-- blueprint:source-hash d9e982764e7afde093c886e46051e01a5b2686a46260d2e57ec8fca51fe53ce1 -->
+<!-- blueprint:source-hash 75f3659c890bfb088b6f0a29401dfe204aa6cc0ebdb05e8af0404760d146053b -->
 
 > A fast, free, private video-to-GIF converter that runs entirely in the browser:
 > no upload, no watermark, no sign-up. Upload, trim, convert, download in under a
