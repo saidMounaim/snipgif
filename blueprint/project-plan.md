@@ -20,8 +20,8 @@ watermark, no sign-up, and the whole flow (upload → trim → convert → downl
 takes less than a minute.
 
 Main purpose: become the go-to simple GIF maker that ranks well on Google for
-searches like "video to gif", "mp4 to gif", and "make gif from video", and earn
-revenue through respectful advertising.
+searches like "video to gif", "mp4 to gif", and "make gif from video". Snipgif is
+free and open source on GitHub, with no ads and no paid tier.
 
 ## 2. Users - Who is this for?
 
@@ -50,7 +50,7 @@ The site is English only.
 - Standalone GIF compressor
 - Mobile-first responsive UI with dark and light mode
 - Technical SEO, landing pages per format, and a blog
-- Legal and trust pages, cookie consent, and Google AdSense
+- Legal and trust pages
 
 **Explicit exclusions for the MVP:**
 
@@ -69,12 +69,11 @@ What is stored:
 
 - **User preferences (browser localStorage):** theme and last-used conversion
   settings
-- **Cookie consent choice (cookie):** managed by the consent platform
 - **Blog and guide content (Markdown files in the repo):** articles, FAQ text,
   and landing page copy
 - **Anonymous analytics (third-party):** page views, conversions started and
   completed, chosen presets, errors, and device type, with no personal data
-- **Static config files:** `ads.txt` for AdSense, `sitemap.xml`, `robots.txt`
+- **Static config files:** `sitemap.xml`, `robots.txt`
 
 ## 5. Tech - What stack are we using?
 
@@ -84,37 +83,25 @@ What is stored:
   the converter page ships JavaScript
 - **Styling:** Tailwind CSS with the app's own small components (no shadcn/ui)
 - **Video processing:** ffmpeg.wasm, using the **single-threaded core**. The
-  multi-threaded core needs COOP/COEP headers, which break Google AdSense ads.
+  multi-threaded core needs COOP/COEP headers, which block third-party
+  resources that do not opt in, such as the Google Analytics tag.
 - **ffmpeg core hosting:** loaded on demand from jsDelivr CDN (the core file is
   around 30 MB, larger than some static hosts allow per file), and only after
   the user selects a video, so page load stays fast
 - **Icons:** Lucide
-- **Analytics:** Google Analytics 4 (integrates with AdSense reporting)
-- **Consent:** a Google-certified CMP (Google's own Privacy & messaging tool in
-  AdSense is free)
-- **Contact form:** Formspree or a similar form service (no backend needed)
+- **Analytics:** Google Analytics 4 with Consent Mode: analytics storage stays
+  denied for visitors in the EEA, the UK, and Switzerland (cookieless
+  measurement only), so no consent banner is needed
 - **Language:** TypeScript
 
 ## 6. Monetize - How will this make money?
 
-**Phase 1 - Google AdSense (launch):**
+It won't. Snipgif is a free, open-source project (MIT license) on GitHub:
 
-- Ads placed where they don't interrupt the task: sidebar on desktop, below the
-  finished GIF, and between paragraphs on blog posts
-- The conversion wait time is a natural moment for a visible ad slot near the
-  progress bar
-- No pop-ups, no interstitials, and no ads that shift the layout, to protect
-  user trust and Core Web Vitals
+- No ads, no paid tier, and no affiliate links
+- Every feature is free for everyone
 - Traffic strategy: rank on Google through format landing pages and how-to
   blog posts
-
-**Phase 2 - Optional later ideas (not in MVP):**
-
-- Snipgif Pro: ad-free, larger file limits, batch conversion, and extra export
-  formats, as a low monthly price
-- Affiliate links in blog guides (screen recorders, video editors)
-- Apply to higher-paying ad networks such as Ezoic or Mediavine once monthly
-  traffic grows
 
 ## 7. UI/UX - How should this look and feel?
 
@@ -133,7 +120,7 @@ what to do within 3 seconds of landing.
   a sticky download button on small screens
 - **Dark and light mode:** follows the system setting with a manual toggle
 - **Below the tool:** short "How it works" steps, feature highlights, and an FAQ
-  section (good for SEO and for AdSense approval)
+  section (good for SEO)
 - **Accessibility:** keyboard navigation, visible focus states, good color
   contrast, and alt text
 
@@ -141,23 +128,20 @@ Inspiration: the simplicity of Squoosh and Remove.bg, where the tool is the page
 
 ## 8. Deployment - Where and how will this ship?
 
-- **Host:** Cloudflare Pages (free plan allows commercial use and has unlimited
-  bandwidth). Note: Vercel's free Hobby plan does not allow commercial use,
-  and ads count as commercial.
+- **Host:** Vercel. The free Hobby plan fits because Snipgif is a
+  non-commercial open-source project with no ads.
 - **App type:** static site
 - **Build command:** `npm run build`
 - **Output directory:** `dist`
 - **Environment variables:**
   - `PUBLIC_SITE_URL`
-  - `PUBLIC_ADSENSE_CLIENT_ID`
   - `PUBLIC_GA_MEASUREMENT_ID`
-  - `PUBLIC_FORMSPREE_ID`
 - **Database or storage:** none
 - **Workers or cron jobs:** none
 - **Health check path:** not needed for a static site
-- **Domain:** snipgif.com if available (alternatives: snipgif.app, snipgif.io),
-  with HTTPS and redirect of www to the root domain
-- **Required root files:** `ads.txt`, `robots.txt`, `sitemap.xml`
+- **Domain:** the Vercel subdomain (`snipgif.vercel.app`) for now, with HTTPS;
+  a custom domain can be added later
+- **Required root files:** `robots.txt`, `sitemap.xml`
 - **After launch:** submit the sitemap to Google Search Console and Bing
   Webmaster Tools
 
@@ -172,10 +156,10 @@ Inspiration: the simplicity of Squoosh and Remove.bg, where the tool is the page
 - **Device limits:** browser memory limits large videos, especially on phones.
   Set a recommended input limit (around 200 MB) and a maximum GIF length
   (around 30 seconds), with clear warnings instead of crashes.
-- **Privacy and compliance:** GDPR consent for EU/UK visitors (required by
-  Google for ads), a clear privacy policy, and compliance with Morocco's data
-  protection law 09-08 (CNDP)
-- **Security:** small attack surface since there is no backend; protect the
-  contact form from spam with the form service's built-in protection
+- **Privacy and compliance:** no analytics cookies for EEA, UK, and Swiss
+  visitors (so no consent banner), a clear privacy policy, and compliance with
+  Morocco's data protection law 09-08 (CNDP)
+- **Security:** small attack surface since there is no backend and no forms
+- **Contact:** no contact page, form, or email; questions go to GitHub issues
 - **Explicit non-requirements:** no accounts, no file storage, no server-side
   processing, no URL video downloading, no enterprise or multi-tenant features

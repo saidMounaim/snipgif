@@ -35,7 +35,6 @@ const TOOL_LINKS = [
 const SITE_LINKS = [
 	{ href: '/blog', label: 'Guides' },
 	{ href: '/about', label: 'About' },
-	{ href: '/contact', label: 'Contact' },
 	{ href: '/privacy', label: 'Privacy' },
 	{ href: '/terms', label: 'Terms' },
 	{ href: '/cookies', label: 'Cookies' },
@@ -48,9 +47,6 @@ const FOCUS = 'outline-none focus-visible:ring-3 focus-visible:ring-ring';
 // Build-time public value; anything that is not a GA4 measurement ID is treated as unset, so no tag loads.
 const rawGaId: unknown = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 const gaId = typeof rawGaId === 'string' && /^G-[A-Z0-9]+$/.test(rawGaId) ? rawGaId : null;
-// Same rule for the AdSense client ID; its site code also shows Google's consent message to EEA, UK, and Swiss visitors.
-const rawAdsenseId: unknown = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
-const adsenseId = typeof rawAdsenseId === 'string' && /^ca-pub-[0-9]{16}$/.test(rawAdsenseId) ? rawAdsenseId : null;
 ---
 
 <html lang="en">
@@ -97,13 +93,13 @@ const adsenseId = typeof rawAdsenseId === 'string' && /^ca-pub-[0-9]{16}$/.test(
 			})();
 		</script>
 		{
-			(gaId || adsenseId) && (
+			gaId && (
 				<script is:inline>
 					window.dataLayer = window.dataLayer || [];
 					window.gtag = function () {
 						dataLayer.push(arguments);
 					};
-					// Consent Mode v2: storage stays denied in the EEA, UK, and Switzerland until the consent banner grants it.
+					// Consent Mode v2: storage stays denied in the EEA, UK, and Switzerland (cookieless measurement only, no banner).
 					gtag('consent', 'default', {
 						ad_storage: 'denied',
 						ad_user_data: 'denied',
@@ -122,16 +118,6 @@ const adsenseId = typeof rawAdsenseId === 'string' && /^ca-pub-[0-9]{16}$/.test(
 						analytics_storage: 'granted',
 					});
 				</script>
-			)
-		}
-		{
-			adsenseId && (
-				<script
-					is:inline
-					async
-					src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
-					crossorigin="anonymous"
-				/>
 			)
 		}
 		{
@@ -210,29 +196,8 @@ const adsenseId = typeof rawAdsenseId === 'string' && /^ca-pub-[0-9]{16}$/.test(
 							</li>
 						))
 					}
-					{
-						adsenseId && (
-							<li>
-								<button type="button" id="consent-settings" class={`${FOOTER_LINK} cursor-pointer ${FOCUS}`}>
-									Privacy and cookie settings
-								</button>
-							</li>
-						)
-					}
 				</ul>
 			</nav>
-			{
-				adsenseId && (
-					<script is:inline>
-						// Reopens Google's consent message. Queued so a click before the AdSense code loads, or while it is blocked, never throws.
-						document.getElementById('consent-settings')?.addEventListener('click', () => {
-							window.googlefc = window.googlefc || {};
-							window.googlefc.callbackQueue = window.googlefc.callbackQueue || [];
-							window.googlefc.callbackQueue.push(() => window.googlefc.showRevocationMessage());
-						});
-					</script>
-				)
-			}
 			<p>Made in your browser. Nothing is uploaded.</p>
 		</footer>
 	</body>

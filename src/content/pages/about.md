@@ -21,7 +21,8 @@ uploaded, never stored by Snipgif, and are gone when you close the tab.
 
 - **No watermark.** Snipgif never adds a logo or mark to your GIFs.
 - **No sign-up.** There are no accounts. Open the page and start.
-- **Free to use.** Snipgif is supported by ads, which never block the converter.
+- **Free and open source.** No ads and no paid tier. The code is on
+  [GitHub](https://github.com/saidMounaim/snipgif) under the MIT License.
 
 ## Who it is for
 

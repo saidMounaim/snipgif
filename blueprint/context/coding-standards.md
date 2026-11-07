@@ -48,7 +48,7 @@
 - Logic and utilities: `src/lib/[utility].ts`
 - Types: `src/types/[feature].ts`
 - Global styles: `src/styles/global.css`
-- Static assets served as-is: `public/` (favicons, `robots.txt`, `ads.txt`)
+- Static assets served as-is: `public/` (favicons, fonts, the Open Graph image)
 
 ## Naming
 
@@ -96,8 +96,9 @@
   private mode or blocked storage never breaks the page.
 - Public config comes from `import.meta.env.PUBLIC_*` variables; there are no
   server secrets. Never put a secret in a `PUBLIC_` variable.
-- Do not add COOP/COEP headers: they break AdSense, which is why the plan uses
-  the single-threaded ffmpeg.wasm core.
+- Do not add COOP/COEP headers: they block third-party resources that do not opt
+  in, such as the GA4 tag, which is why the plan uses the single-threaded
+  ffmpeg.wasm core.
 
 ## Error Handling
 

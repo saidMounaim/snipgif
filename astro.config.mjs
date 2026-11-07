@@ -9,8 +9,8 @@ const { PUBLIC_SITE_URL } = loadEnv(process.env.NODE_ENV ?? 'production', proces
 
 // https://astro.build/config
 export default defineConfig({
-  site: (PUBLIC_SITE_URL || 'https://snipgif.com').replace(/\/+$/, ''),
-  // Slash-less URLs match the nav links; `file` output lets Cloudflare Pages serve them without a redirect.
+  site: (PUBLIC_SITE_URL || 'https://snipgif.vercel.app').replace(/\/+$/, ''),
+  // Slash-less URLs match the nav links; `file` output plus `cleanUrls` in vercel.json serves them without a redirect.
   trailingSlash: 'never',
   build: { format: 'file' },
 

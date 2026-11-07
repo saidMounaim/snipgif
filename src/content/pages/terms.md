@@ -2,10 +2,10 @@
 title: Terms of Use | Snipgif
 description: The terms for using Snipgif, the free in-browser video to GIF converter and GIF compressor.
 heading: Terms of Use
-updated: 2026-10-31
+updated: 2026-11-07
 ---
 
-These terms apply to your use of snipgif.com and its tools (together, the
+These terms apply to your use of the Snipgif website and its tools (together, the
 "service"), operated by Snipgif. By using the service, you agree to them. If
 you do not agree, please do not use the service.
 
@@ -32,14 +32,13 @@ When using the service, do not:
 - create or share content that is illegal, or that infringes anyone's rights;
 - try to disrupt, overload, or gain unauthorized access to the site or its
   hosting;
-- copy, scrape, or resell the site or its content in bulk;
-- interfere with or misrepresent the ads shown on the site.
+- copy, scrape, or resell the site or its content in bulk.
 
-## Advertising
+## Open source
 
-The service is supported by ads, including ads served by Google and its
-partners. Snipgif is not responsible for the content of third-party ads or the
-websites they link to.
+The Snipgif source code is available on [GitHub](https://github.com/saidMounaim/snipgif) under the MIT
+License. The license governs the code; these terms govern your use of this
+website.
 
 ## No warranty
 

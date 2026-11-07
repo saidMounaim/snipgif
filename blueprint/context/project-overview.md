@@ -1,10 +1,10 @@
 # Snipgif - Project Overview
 
-<!-- blueprint:source-hash 7f80fa546a0b28dbe76a0d269c3984ad32d81a7d17a67fd5e41de7e6142e57d7 -->
+<!-- blueprint:source-hash d9e982764e7afde093c886e46051e01a5b2686a46260d2e57ec8fca51fe53ce1 -->
 
 > A fast, free, private video-to-GIF converter that runs entirely in the browser:
 > no upload, no watermark, no sign-up. Upload, trim, convert, download in under a
-> minute. Monetized with respectful AdSense ads and grown through Google search.
+> minute. Free and open source (MIT), with no ads, grown through Google search.
 
 ## Problem
 
@@ -39,10 +39,11 @@ only.
 - **Device limits:** browser memory caps large videos, especially on phones.
   Recommended input limit about **200 MB**, max GIF length about **30 seconds**,
   with clear warnings instead of crashes.
-- **Privacy and compliance:** GDPR consent for EU/UK visitors (required by Google
-  for ads), a clear privacy policy, and Morocco data protection law 09-08 (CNDP).
-- **Security:** no backend, small attack surface. Contact form spam protection
-  comes from the form service.
+- **Privacy and compliance:** no analytics cookies for EEA, UK, and Swiss
+  visitors (so no consent banner), a clear privacy policy, and Morocco data
+  protection law 09-08 (CNDP).
+- **Security:** no backend and no forms, small attack surface. No contact page
+  or email; questions go to GitHub issues.
 - **Non-requirements:** no accounts, no file storage, no server-side processing,
   no downloading videos from URLs (YouTube, TikTok, Instagram: ToS and copyright
   risk), no enterprise or multi-tenant features.
@@ -77,13 +78,12 @@ In build-plan order. The headline is the converter flow, features 1 to 6.
     GIF, GIF Compressor) with unique text and FAQ schema.
 14. **Performance optimization** - lazy-load the converter, optimize images and
     fonts, keep Core Web Vitals green.
-15. **Trust and legal pages** - About, Contact, Privacy Policy, Terms of Use,
-    Cookie Policy (needed for AdSense approval).
+15. **Trust and legal pages** - About, Privacy Policy, Terms of Use,
+    Cookie Policy.
 16. **Blog and guides** - how-to articles for long-tail search traffic.
 18. **Analytics** - visits, completed conversions, popular settings.
-19. **Cookie consent banner** - Google-certified CMP for EU/UK ad consent.
-20. **Google AdSense integration** - non-intrusive slots that never block the
-    conversion flow or shift layout.
+19. **Cookie consent banner** - removed by a later fix: with no ads, no banner is
+    needed; the Consent Mode defaults stay for GA4.
 21. **Installable PWA** - install on phone or desktop and use offline.
 22. **More output formats** - animated WebP, MP4 (GIF to video), and APNG.
 
@@ -115,10 +115,6 @@ memory and are discarded when the tab closes.
 - `theme` (`"system" | "light" | "dark"`)
 - `lastSettings` (`OutputSettings`)
 
-### Consent (cookie)
-
-- Consent choice, owned and stored by the CMP, not by app code.
-
 ### Content (Markdown in repo, Astro content collections)
 
 - Blog post / guide - `title`, `description`, `slug`, publish date, body.
@@ -133,7 +129,7 @@ memory and are discarded when the tab closes.
 
 ### Static root files
 
-- `ads.txt`, `robots.txt`, `sitemap.xml`.
+- `robots.txt`, `sitemap.xml`.
 
 ## Tech stack
 
@@ -145,22 +141,18 @@ memory and are discarded when the tab closes.
 - **Tailwind CSS + shadcn/ui** - styling and UI components (shadcn inside React
   islands).
 - **ffmpeg.wasm, single-threaded core** - video processing. The multi-threaded
-  core needs COOP/COEP headers, which break AdSense, so it is out.
+  core needs COOP/COEP headers, which block third-party resources that do not
+  opt in (such as the Google Analytics tag), so it is out.
 - **ffmpeg core from jsDelivr CDN** - about 30 MB, loaded on demand only after a
   video is selected, so page load stays fast.
 - **Lucide** - icons.
-- **Google Analytics 4** - analytics, integrates with AdSense reporting.
-- **Google Privacy & messaging (AdSense CMP)** - free Google-certified consent.
-- **Formspree (or similar)** - contact form without a backend.
+- **Google Analytics 4 with Consent Mode** - analytics; storage stays denied for
+  EEA, UK, and Swiss visitors (cookieless measurement only), so no banner.
 
 ## Monetization
 
-- **Phase 1 (launch): Google AdSense.** Desktop sidebar, below the finished GIF,
-  between blog paragraphs, and a visible slot near the progress bar during
-  conversion. No pop-ups, no interstitials, no layout-shifting ads.
-- **Phase 2 (not MVP):** Snipgif Pro (ad-free, larger limits, batch, extra
-  export formats), affiliate links in guides, higher-paying ad networks (Ezoic,
-  Mediavine) once traffic grows.
+None. Snipgif is free and open source on GitHub under the MIT license: no ads,
+no paid tier, no affiliate links, and every feature free for everyone.
 
 ## UI/UX
 
@@ -187,20 +179,19 @@ Routes (slugs indicative, finalize in each feature spec):
   converter
 - `/gif-compressor` - standalone compressor
 - `/blog`, `/blog/<slug>` - guides
-- `/about`, `/contact`, `/privacy`, `/terms`, `/cookies` - trust and legal
+- `/about`, `/privacy`, `/terms`, `/cookies` - trust and legal
 
 ## Deployment
 
-- **Host:** Cloudflare Pages (free plan allows commercial use and unlimited
-  bandwidth; Vercel Hobby forbids commercial use, and ads count).
+- **Host:** Vercel, free Hobby plan (non-commercial open-source project, no
+  ads).
 - **App type:** static site. No database, storage, workers, or cron. No health
   check needed.
 - **Build:** `npm run build`, output directory `dist`.
-- **Env vars:** `PUBLIC_SITE_URL`, `PUBLIC_ADSENSE_CLIENT_ID`,
-  `PUBLIC_GA_MEASUREMENT_ID`, `PUBLIC_FORMSPREE_ID`.
-- **Domain:** snipgif.com if available (else snipgif.app or snipgif.io), HTTPS,
-  www redirects to the root domain.
-- **Root files:** `ads.txt`, `robots.txt`, `sitemap.xml`.
+- **Env vars:** `PUBLIC_SITE_URL`, `PUBLIC_GA_MEASUREMENT_ID`.
+- **Domain:** the Vercel subdomain (`snipgif.vercel.app`) for now, HTTPS; a
+  custom domain can come later.
+- **Root files:** `robots.txt`, `sitemap.xml`.
 - **After launch:** submit the sitemap to Google Search Console and Bing
   Webmaster Tools.
 
@@ -209,13 +200,11 @@ Routes (slugs indicative, finalize in each feature spec):
 > Resolve in the plans, then re-run /overview.
 
 - **Features 21 and 22 are not in the project plan MVP.** Section 3 never lists a
-  PWA or extra formats, and section 6 puts extra export formats under Phase 2
-  Pro. Are they MVP, post-MVP free, or Pro?
+  PWA or extra formats. Are they MVP or post-MVP? (There is no paid tier, so
+  either way they are free.)
 - **PWA offline vs on-demand CDN core.** Offline use (feature 21) needs the ~30 MB
   ffmpeg core cached locally, which conflicts with loading it from jsDelivr only
   on demand.
-- **Analytics choice.** Section 5 says GA4; feature 18 says "GA4 or a
-  privacy-friendly alternative".
 - **Copy GIF to clipboard (feature 5).** Browser clipboard APIs reliably support
   PNG, not GIF; decide the fallback (copy a static frame, or hide copy where
   unsupported).

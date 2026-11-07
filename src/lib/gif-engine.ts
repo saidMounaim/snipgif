@@ -10,7 +10,7 @@ import type { SourceVideo } from './video-file';
 // Still-frame previews stay small whatever output width is chosen.
 const FRAME_PREVIEW_WIDTH = 480;
 
-// Single-threaded core: the multi-threaded one needs COOP/COEP headers, which break AdSense.
+// Single-threaded core: the multi-threaded one needs COOP/COEP headers, which block third-party resources such as the GA4 tag.
 const CORE_BASE_URL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm';
 
 export type GifResult = {
