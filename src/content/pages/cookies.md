@@ -19,8 +19,8 @@ Snipgif's own code sets no cookies. It saves the following in your browser:
   setting.
 - **The site's own files** (cache storage) are saved so pages load faster and
   work offline, including when Snipgif is installed as an app. The converter
-  engine (about 30 MB) is added the first time you convert a video or compress a
-  GIF, so the tools also work offline afterwards. These are copies of the
+  engine (about 30 MB) is added the first time you choose a video or GIF in one
+  of the tools, so they also work offline afterwards. These are copies of the
   website, not your data, and nothing is sent anywhere.
 
 Clearing site data in your browser removes all of these.
