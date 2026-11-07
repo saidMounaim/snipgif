@@ -1,0 +1,16 @@
+{
+  "id": "/",
+  "name": "Snipgif - Video to GIF",
+  "short_name": "Snipgif",
+  "description": "Turn any MP4, MOV, WebM, or AVI video into a GIF right in your browser. Trim, crop, add captions, and resize. No upload, no watermark, no sign-up.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fafafd",
+  "theme_color": "#fafafd",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

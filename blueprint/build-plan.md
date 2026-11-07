@@ -37,5 +37,5 @@ Start with your first real slice of functionality.
 - [x] 16. **Blog and guides section** - How-to articles like "How to make a GIF from a video on iPhone" to attract long-tail search traffic.
 - [x] 18. **Analytics** - Track visits, conversions completed, and popular settings with GA4 or a privacy-friendly alternative.
 - [x] 19. **Cookie consent banner** - Consent banner for EU and UK visitors. Removed by fix `remove-adsense-and-prepare-an-open-source-vercel-release` (2026-11-07): with no ads, no banner is needed; the Consent Mode defaults stay for GA4.
-- [ ] 21. **Installable PWA** - Let users install Snipgif on their phone or desktop and use it offline.
+- [x] 21. **Installable PWA** - Let users install Snipgif on their phone or desktop and use it offline.
 - [ ] 22. **More output formats** - Export to animated WebP, MP4 (GIF to video), and APNG for higher quality at smaller file sizes.

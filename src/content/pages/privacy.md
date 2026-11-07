@@ -36,8 +36,10 @@ of that download. Your files are not sent.
 ### Information stored on your device
 
 When you use the theme switch, Snipgif saves your choice in your browser's
-local storage under the key `theme`. It stays on your device and is never sent anywhere. See
-the [Cookie Policy](/cookies) for details.
+local storage under the key `theme`. Snipgif also saves copies of its own pages
+and files, and once used the converter engine, in your browser's cache storage
+so the site loads faster and works offline. None of this is sent anywhere, and
+clearing site data removes it. See the [Cookie Policy](/cookies) for details.
 
 ## Analytics from Google
 

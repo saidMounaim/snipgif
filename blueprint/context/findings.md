@@ -7,10 +7,10 @@
 > finding is `open` or `fixed`, then archives resolved findings with the work
 > and resets this file.
 
-### F-01 [P3] fixed - Build-plan item 15 still lists the removed Contact page
+### F-03 [P3] open - Cookie Policy says the engine is stored on first conversion, but it is stored on file selection
 
-**File:** blueprint/build-plan.md:36
+**File:** src/content/pages/cookies.md:22
 **Found:** 2026-11-07 by /audit independent (scope: current; lens: quality)
-**Why it matters:** Step 5 removed the contact page, and the overview's item 15 now lists only About, Privacy Policy, Terms of Use, and Cookie Policy. The build-plan's item 15 still reads "About, Contact, Privacy Policy, ...", with no note like the one item 19 got, so the plan and the overview disagree about what the trust pages include. The spec only required the overview edit, so this is a consistency cleanup, not a contract break.
-**Suggested fix:** Either drop "Contact" from item 15 or append a short note that this fix removed the contact page, matching the item 19 style, then refresh the overview source-hash through the overview skill. No current requirement would be lost.
-**Resolution:** Fixed by fix `drop-contact-from-build-plan-item-15` (2026-11-07): item 15 now lists only About, Privacy Policy, Terms of Use, and Cookie Policy, with a note that the Contact page was removed. Awaiting `/audit` re-review.
+**Why it matters:** The new Cookie Policy text says the roughly 30 MB converter engine "is added the first time you convert a video or compress a GIF". The Converter (src/components/converter/Converter.tsx:243) and Compressor (src/components/compressor/Compressor.tsx:158) start `loadGifEngine()` as soon as a file is selected, so the service worker stores the engine before any conversion, even when the visitor never clicks Convert. The disclosure about what is stored on the device is slightly inaccurate. The Privacy Policy wording ("once used the converter engine") is fine.
+**Suggested fix:** Reword to "the first time you choose a video or GIF in one of the tools" (or similar). No current requirement would be lost.
+**Resolution:**

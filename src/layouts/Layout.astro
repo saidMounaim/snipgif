@@ -56,6 +56,11 @@ const gaId = typeof rawGaId === 'string' && /^G-[A-Z0-9]+$/.test(rawGaId) ? rawG
 		<link rel="preload" href={geistLatinUrl} as="font" type="font/woff2" crossorigin />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
+		<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+		<link rel="manifest" href="/manifest.webmanifest" />
+		<!-- The light and dark --background tokens as sRGB, for the browser and installed-app title bar. -->
+		<meta name="theme-color" content="#fafafd" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#080811" media="(prefers-color-scheme: dark)" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
@@ -200,5 +205,20 @@ const gaId = typeof rawGaId === 'string' && /^G-[A-Z0-9]+$/.test(rawGaId) ? rawG
 			</nav>
 			<p>Made in your browser. Nothing is uploaded.</p>
 		</footer>
+		{
+			// Production only: in `astro dev` a service worker would cache dev assets.
+			import.meta.env.PROD && (
+				<script is:inline>
+					// Installs the offline cache (public/sw.js); a failure only means no offline support.
+					try {
+						if ('serviceWorker' in navigator) {
+							addEventListener('load', () => {
+								navigator.serviceWorker.register('/sw.js').catch(() => {});
+							});
+						}
+					} catch {}
+				</script>
+			)
+		}
 	</body>
 </html>

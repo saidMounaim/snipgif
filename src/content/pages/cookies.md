@@ -11,12 +11,19 @@ Local storage works the same way but is never sent to a server automatically.
 
 ## What Snipgif stores itself
 
-Snipgif's own code sets no cookies. It saves one value in your browser's local
-storage:
+Snipgif's own code sets no cookies. It saves the following in your browser:
 
-- **`theme`** remembers whether you chose the light, dark, or system theme. It
-  is saved only when you use the theme switch, stays on your device, and is
-  never sent anywhere. Until then, the site follows your device setting.
+- **`theme`** (local storage) remembers whether you chose the light, dark, or
+  system theme. It is saved only when you use the theme switch, stays on your
+  device, and is never sent anywhere. Until then, the site follows your device
+  setting.
+- **The site's own files** (cache storage) are saved so pages load faster and
+  work offline, including when Snipgif is installed as an app. The converter
+  engine (about 30 MB) is added the first time you convert a video or compress a
+  GIF, so the tools also work offline afterwards. These are copies of the
+  website, not your data, and nothing is sent anywhere.
+
+Clearing site data in your browser removes all of these.
 
 Your videos and GIFs are never saved in cookies or storage. They stay in memory
 and are cleared when you close the page.
