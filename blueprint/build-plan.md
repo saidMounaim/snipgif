@@ -38,4 +38,4 @@ Start with your first real slice of functionality.
 - [x] 18. **Analytics** - Track visits, conversions completed, and popular settings with GA4 or a privacy-friendly alternative.
 - [x] 19. **Cookie consent banner** - Consent banner for EU and UK visitors. Removed by fix `remove-adsense-and-prepare-an-open-source-vercel-release` (2026-11-07): with no ads, no banner is needed; the Consent Mode defaults stay for GA4.
 - [x] 21. **Installable PWA** - Let users install Snipgif on their phone or desktop and use it offline.
-- [ ] 22. **More output formats** - Export to animated WebP, MP4 (GIF to video), and APNG for higher quality at smaller file sizes.
+- [ ] 23. **README and Vercel deployment** - Polish the README for the open-source GitHub repository (what Snipgif is, features, screenshots, local setup, contributing) and deploy the site to Vercel with its production environment variables.

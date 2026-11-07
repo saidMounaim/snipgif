@@ -1,6 +1,6 @@
 # Snipgif - Project Overview
 
-<!-- blueprint:source-hash 75f3659c890bfb088b6f0a29401dfe204aa6cc0ebdb05e8af0404760d146053b -->
+<!-- blueprint:source-hash b5dcb83b00b8f3fc11b6864aaf37a73d9d6bb302f83c8c90620f495956417c53 -->
 
 > A fast, free, private video-to-GIF converter that runs entirely in the browser:
 > no upload, no watermark, no sign-up. Upload, trim, convert, download in under a
@@ -85,7 +85,8 @@ In build-plan order. The headline is the converter flow, features 1 to 6.
 19. **Cookie consent banner** - removed by a later fix: with no ads, no banner is
     needed; the Consent Mode defaults stay for GA4.
 21. **Installable PWA** - install on phone or desktop and use offline.
-22. **More output formats** - animated WebP, MP4 (GIF to video), and APNG.
+23. **README and Vercel deployment** - polish the open-source README (features,
+    screenshots, local setup, contributing) and deploy to Vercel.
 
 ## Data model
 
@@ -106,8 +107,8 @@ memory and are discarded when the tab closes.
 - `ConversionState` - `status` (`"idle" | "loading-core" | "converting" | "done"
   | "error"`), `progress` (0 to 1), `error` (friendly message key or null)
 
-> Lock `OutputSettings` and `ClipRange` in features 3 and 4; features 7 to 10, 18,
-> and 22 build on them. Exact FPS, width, and quality ranges and preset values are
+> Lock `OutputSettings` and `ClipRange` in features 3 and 4; features 7 to 10 and
+> 18 build on them. Exact FPS, width, and quality ranges and preset values are
 > a TODO for the feature 4 spec.
 
 ### User preferences (localStorage)
@@ -199,12 +200,6 @@ Routes (slugs indicative, finalize in each feature spec):
 
 > Resolve in the plans, then re-run /overview.
 
-- **Features 21 and 22 are not in the project plan MVP.** Section 3 never lists a
-  PWA or extra formats. Are they MVP or post-MVP? (There is no paid tier, so
-  either way they are free.)
-- **PWA offline vs on-demand CDN core.** Offline use (feature 21) needs the ~30 MB
-  ffmpeg core cached locally, which conflicts with loading it from jsDelivr only
-  on demand.
 - **Copy GIF to clipboard (feature 5).** Browser clipboard APIs reliably support
   PNG, not GIF; decide the fallback (copy a static frame, or hide copy where
   unsupported).
